@@ -31,9 +31,12 @@ public class Plugin : BaseUnityPlugin
                     string name = "No Name";
                     if (jValues.ContainsKey("name"))
                         name = jValues["name"];
-                    Debug.Log("Found .uksr " + name + " at path " + file.FullName);
-                    SoundPackController.SoundPack newPack = SoundPackController.CreateNewSoundPack(name);
-                    StartCoroutine(newPack.LoadFromDirectory(file.Directory));
+                    if (name != "Template")
+                    {
+                        Debug.Log("Found .uksr " + name + " at path " + file.FullName);
+                        SoundPackController.SoundPack newPack = SoundPackController.CreateNewSoundPack(name);
+                        StartCoroutine(newPack.LoadFromDirectory(file.Directory));
+                    }
                     jFile.Close();
                 }
             }
@@ -45,7 +48,7 @@ public class Plugin : BaseUnityPlugin
                 using (StreamReader jFile = saveFileInfo.OpenText())
                 {
                     Dictionary<string, string> jValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(jFile.ReadToEnd());
-                    string name = "No Name"; 
+                    string name = "No Name";
                     if (jValues.ContainsKey("name"))
                         name = jValues["name"];
                     Debug.Log("Found a .uksf save file, setting sound pack to " + name);
@@ -236,6 +239,7 @@ public static class SoundPackController
     public class SoundPack
     {
         public string name = "NOT ASSIGNED"; // I swear to god if I see this in game
+        public Texture2D previewImage;
         private Dictionary<string, SoundAspect> allAspects = new Dictionary<string, SoundAspect>();
 
         public SoundPack(string name)
@@ -296,6 +300,22 @@ public static class SoundPackController
                         {
                             aspect.allClips.Add(DownloadHandlerAudioClip.GetContent(www));
                         }
+                    }
+                }
+            }
+            if (File.Exists(info.FullName + "\\preview.png"))
+            {
+                using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(info.FullName + "\\preview.png"))
+                {
+                    yield return www.SendWebRequest();
+                    if (www.isNetworkError)
+                    {
+                        Debug.Log("couldn't load preview image " + info.FullName + "\\preview.png");
+                        Debug.Log(www.error);
+                    }
+                    else
+                    {
+                        previewImage = DownloadHandlerTexture.GetContent(www);
                     }
                 }
             }
@@ -383,7 +403,20 @@ public static class Inject_SoundPackShops
             {
                 GameObject newPack = GameObject.Instantiate(packTemplate, contentParent);
                 newPack.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = Color.gray;
-                newPack.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false);
+                if (pack.previewImage != null)
+                {
+                    GameObject.Destroy(newPack.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<Image>());
+                    IEnumerator setImageNextFrame() // So unity waits a frame before destroying a component, hence this
+                    {
+                        yield return null;
+                        RawImage img = newPack.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.AddComponent<RawImage>();
+                        img.texture = pack.previewImage;
+                        img.raycastTarget = false;
+                    }
+                    __instance.StartCoroutine(setImageNextFrame());
+                }
+                else
+                    newPack.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false);
                 ShopButton sButton = newPack.GetComponent<ShopButton>();
                 sButton.toActivate = new GameObject[] { };
                 newPack.GetComponent<ShopButton>().toDeactivate = new GameObject[] { };
@@ -396,12 +429,14 @@ public static class Inject_SoundPackShops
                     source.volume = 1f;
                     source.Play();
                 });
-                GameObject newText = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Weapons").Find("ArmButton").gameObject, newPack.transform.GetChild(0).GetChild(0).GetChild(0)); // yes I tried making a "prefab" out of this and instantiating it, didn't work
+                GameObject newText = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Weapons").Find("ArmButton").gameObject, newPack.transform.GetChild(0).GetChild(0)); // yes I tried making a "prefab" out of this and instantiating it, didn't work
                 GameObject.Destroy(newText.GetComponent<ShopButton>());
                 newText.transform.localPosition = Vector3.zero;
                 newText.transform.localScale = new Vector3(0.4167529f, 0.4167529f, 0.4167529f);
-                newText.GetComponentInChildren<Text>().text = pack.name;
-                newText.transform.SetParent(newPack.transform.GetChild(0).GetChild(0)); // so I got the values by finding the 3rd child, but now I set it to be inactive sooooooo
+                newText.layer = 5;
+                Text text = newText.GetComponentInChildren<Text>();
+                text.text = pack.name;
+                text.raycastTarget = false;
             }
             packTemplate.SetActive(false);
 
