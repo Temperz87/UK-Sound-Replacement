@@ -1,17 +1,19 @@
 ﻿using BepInEx;
 using HarmonyLib;
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.IO;
+using System.Linq;
+using UnityEngine;
 using UnityEngine.Networking;
-using Newtonsoft.Json;
 using UnityEngine.UI;
 
 [BepInPlugin("UKSoundReplacement", "UKSoundReplacement", "1.0.0")]
 public class Plugin : BaseUnityPlugin
 {
     public static bool patched = false;
+    public static FileInfo saveFileInfo;
 
     public void Start()
     {
@@ -19,112 +21,177 @@ public class Plugin : BaseUnityPlugin
         {
             new Harmony("tempy.soundreplacement").PatchAll();
             DirectoryInfo info = new DirectoryInfo(Directory.GetCurrentDirectory());
+            SoundPackController.CreateNewSoundPack("Stock");
             Debug.Log("Searching " + Directory.GetCurrentDirectory() + " for .uksr files");
             foreach (FileInfo file in info.GetFiles("*.uksr", SearchOption.AllDirectories))
             {
                 using (StreamReader jFile = file.OpenText())
                 {
                     Dictionary<string, string> jValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(jFile.ReadToEnd());
-                    Debug.Log("Found .uksr " + jValues["name"] + " at path " + file.FullName);
-                    SoundPackController.SoundPack newPack = SoundPackController.CreateNewSoundPack(jValues["name"]);
+                    string name = "No Name";
+                    if (jValues.ContainsKey("name"))
+                        name = jValues["name"];
+                    Debug.Log("Found .uksr " + name + " at path " + file.FullName);
+                    SoundPackController.SoundPack newPack = SoundPackController.CreateNewSoundPack(name);
                     StartCoroutine(newPack.LoadFromDirectory(file.Directory));
                     jFile.Close();
                 }
             }
-            SoundPackController.SetCurrentSoundPack("BVSSIC");
+
+            FileInfo[] allFiles = info.GetFiles("*.uksf", SearchOption.AllDirectories);
+            if (allFiles.Count() > 0)
+            {
+                saveFileInfo = allFiles[0];
+                using (StreamReader jFile = saveFileInfo.OpenText())
+                {
+                    Dictionary<string, string> jValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(jFile.ReadToEnd());
+                    string name = "No Name"; 
+                    if (jValues.ContainsKey("name"))
+                        name = jValues["name"];
+                    Debug.Log("Found a .uksf save file, setting sound pack to " + name);
+                    SoundPackController.SetCurrentSoundPack(name);
+                    jFile.Close();
+                }
+            }
+
             patched = true;
+        }
+    }
+
+    public void OnApplicationQuit()
+    {
+        using (StreamReader jFile = saveFileInfo.OpenText())
+        {
+            Dictionary<string, string> jValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(jFile.ReadToEnd());
+            if (jValues.ContainsKey("name"))
+                jValues["name"] = SoundPackController.currentSoundPackName;
+            jFile.Close();
+            File.WriteAllText(saveFileInfo.FullName, JsonConvert.SerializeObject(jValues));
         }
     }
 }
 
 public static class SoundPackController
 {
+    public static string currentSoundPackName = "Stock";
     private static Dictionary<string, SoundPack> allSoundPacks = new Dictionary<string, SoundPack>();
     private static SoundPack currentSoundPack = null;
+    private static List<string> stockLoadedAspects = new List<string>();
 
     public static SoundPack CreateNewSoundPack(string name)
     {
         SoundPack result = new SoundPack(name);
 
-        result.AddAspect(new SoundAspect("RailcannonChargedSounds", "RailcannonSounds", true));
+        result.AddAspect(new SoundAspect("RailcannonChargedSounds", "RailcannonSounds", true, new string[] { "RailcannonFullClickAndCharge" }));
 
-        result.AddAspect(new SoundAspect("RailcannonClickSounds0", "RailcannonSounds\\RailcannonBlue", false));
-        result.AddAspect(new SoundAspect("RailcannonIdleSounds0", "RailcannonSounds\\RailcannonBlue", false));
-        result.AddAspect(new SoundAspect("RailcannonShootSounds0", "RailcannonSounds\\RailcannonBlue", false));
-        result.AddAspect(new SoundAspect("RailcannonWhirSounds0", "RailcannonSounds\\RailcannonBlue", false));
+        result.AddAspect(new SoundAspect("RailcannonClickSounds0", "RailcannonSounds\\RailcannonBlue", false, new string[] { "RailcannonPipClick" }));
+        result.AddAspect(new SoundAspect("RailcannonIdleSounds0", "RailcannonSounds\\RailcannonBlue", false, new string[] { "RailcannonFull" }));
+        result.AddAspect(new SoundAspect("RailcannonShootSounds0", "RailcannonSounds\\RailcannonBlue", false, new string[] { "RailcannonFire4" }));
+        result.AddAspect(new SoundAspect("RailcannonWhirSounds0", "RailcannonSounds\\RailcannonBlue", false, new string[] { "RailcannonPipidle" }));
 
-        result.AddAspect(new SoundAspect("RailcannonClickSounds1", "RailcannonSounds\\RailcannonGreen", false));
-        result.AddAspect(new SoundAspect("RailcannonIdleSounds1", "RailcannonSounds\\RailcannonGreen", false));
-        result.AddAspect(new SoundAspect("RailcannonShootSounds1", "RailcannonSounds\\RailcannonGreen", false));
-        result.AddAspect(new SoundAspect("RailcannonWhirSounds1", "RailcannonSounds\\RailcannonGreen", false));
+        result.AddAspect(new SoundAspect("RailcannonClickSounds1", "RailcannonSounds\\RailcannonGreen", false, new string[] { "RailcannonPipClick" }));
+        result.AddAspect(new SoundAspect("RailcannonIdleSounds1", "RailcannonSounds\\RailcannonGreen", false, new string[] { "RailcannonFull" }));
+        result.AddAspect(new SoundAspect("RailcannonShootSounds1", "RailcannonSounds\\RailcannonGreen", false, new string[] { "RailcannonFire4" }));
+        result.AddAspect(new SoundAspect("RailcannonWhirSounds1", "RailcannonSounds\\RailcannonGreen", false, new string[] { "RailcannonPipidle" }));
 
-        result.AddAspect(new SoundAspect("RailcannonClickSounds2", "RailcannonSounds\\RailcannonRed", false));
-        result.AddAspect(new SoundAspect("RailcannonIdleSounds2", "RailcannonSounds\\RailcannonRed", false));
-        result.AddAspect(new SoundAspect("RailcannonShootSounds2", "RailcannonSounds\\RailcannonRed", false));
-        result.AddAspect(new SoundAspect("RailcannonRedWindDownSounds2", "RailcannonSounds\\RailcannonRed", false));
-        result.AddAspect(new SoundAspect("RailcannonWhirSounds2", "RailcannonSounds\\RailcannonRed", false));
+        result.AddAspect(new SoundAspect("RailcannonClickSounds2", "RailcannonSounds\\RailcannonRed", false, new string[] { "RailcannonPipClick" }));
+        result.AddAspect(new SoundAspect("RailcannonIdleSounds2", "RailcannonSounds\\RailcannonRed", false, new string[] { "RailcannonFull" }));
+        result.AddAspect(new SoundAspect("RailcannonShootSounds2", "RailcannonSounds\\RailcannonRed", false, new string[] { "RailcannonFire5" }));
+        result.AddAspect(new SoundAspect("RailcannonRedWindDownSounds2", "RailcannonSounds\\RailcannonRed", false, new string[] { "Bluezone-Autobots-shutdown-003" }));
+        result.AddAspect(new SoundAspect("RailcannonWhirSounds2", "RailcannonSounds\\RailcannonRed", false, new string[] { "RailcannonPipidle" }));
 
-        result.AddAspect(new SoundAspect("CoinBreak1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman"));
-        result.AddAspect(new SoundAspect("CoinFlashLoop1False", "CoinFlashLoop", "RevolverSounds\\RevolverMarksman"));
-        result.AddAspect(new SoundAspect("CoinFlip1False", "CoinFlip", "RevolverSounds\\RevolverMarksman"));
-        result.AddAspect(new SoundAspect("CoinReady1False", "CoinReady", "RevolverSounds\\RevolverMarksman"));
-        result.AddAspect(new SoundAspect("CoinSpin1False", "CoinSpin", "RevolverSounds\\RevolverMarksman"));
-        result.AddAspect(new SoundAspect("CoinTwirl1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman"));
-        result.AddAspect(new SoundAspect("CoinRicochet1False", "Ricochet", "RevolverSounds\\RevolverMarksmanAlt"));
-        result.AddAspect(new SoundAspect("RevolverShootSounds1False", "ShootSounds", "RevolverSounds\\RevolverMarksman"));
+        result.AddAspect(new SoundAspect("CoinBreak1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman", new string[] { "Twirling" }));
+        result.AddAspect(new SoundAspect("CoinFlashLoop1False", "CoinFlashLoop", "RevolverSounds\\RevolverMarksman", new string[] { "coinflashloop" }));
+        result.AddAspect(new SoundAspect("CoinFlip1False", "CoinFlip", "RevolverSounds\\RevolverMarksman", new string[] { "coinflip" }));
+        result.AddAspect(new SoundAspect("CoinReady1False", "CoinReady", "RevolverSounds\\RevolverMarksman", new string[] { "Bell_10_b" }));
+        result.AddAspect(new SoundAspect("CoinSpin1False", "CoinSpin", "RevolverSounds\\RevolverMarksman", new string[] { "coinspin" }));
+        result.AddAspect(new SoundAspect("CoinTwirl1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman", new string[] { "Twirling" }));
+        result.AddAspect(new SoundAspect("CoinRicochet1False", "Ricochet", "RevolverSounds\\RevolverMarksman", new string[] { "Ricochet" }));
+        result.AddAspect(new SoundAspect("RevolverShootSounds1False", "ShootSounds", "RevolverSounds\\RevolverMarksman", new string[] { "Shoot1", "Shoot1c3", "Shoot1c4" }));
 
-        result.AddAspect(new SoundAspect("CoinBreak1True", "CoinTwirl", "RevolverSounds\\RevolverMarksmanAlt"));
-        result.AddAspect(new SoundAspect("CoinFlashLoop1True", "CoinFlashLoop", "RevolverSounds\\RevolverMarksmanAlt"));
-        result.AddAspect(new SoundAspect("CoinFlip1True", "CoinFlip", "RevolverSounds\\RevolverMarksmanAlt"));
-        result.AddAspect(new SoundAspect("CoinReady1True", "CoinReady", "RevolverSounds\\RevolverMarksmanAlt"));
-        result.AddAspect(new SoundAspect("CoinSpin1True", "CoinSpin", "RevolverSounds\\RevolverMarksmanAlt"));
-        result.AddAspect(new SoundAspect("CoinTwirl1True", "CoinTwirl", "RevolverSounds\\RevolverMarksmanAlt"));
-        result.AddAspect(new SoundAspect("CoinRicochet1True", "Ricochet", "RevolverSounds\\RevolverMarksmanAlt"));
-        result.AddAspect(new SoundAspect("RevolverShootSounds1True", "ShootSounds", "RevolverSounds\\RevolverMarksmanAlt"));
+        result.AddAspect(new SoundAspect("CoinBreak1True", "CoinTwirl", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "Twirling" }));
+        result.AddAspect(new SoundAspect("CoinFlashLoop1True", "CoinFlashLoop", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "coinflashloop" }));
+        result.AddAspect(new SoundAspect("CoinFlip1True", "CoinFlip", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "coinflip" }));
+        result.AddAspect(new SoundAspect("CoinReady1True", "CoinReady", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "Bell_10_b" }));
+        result.AddAspect(new SoundAspect("CoinSpin1True", "CoinSpin", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "coinspin" }));
+        result.AddAspect(new SoundAspect("CoinTwirl1True", "CoinTwirl", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "Twirling" }));
+        result.AddAspect(new SoundAspect("CoinRicochet1True", "Ricochet", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "Ricochet" }));
+        result.AddAspect(new SoundAspect("RevolverShootSounds1True", "ShootSounds", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "AltRevolverShoot1D" }));
 
-        result.AddAspect(new SoundAspect("ChargeLoop0False", "ChargeLoop", "RevolverSounds\\RevolverPiercer"));
-        result.AddAspect(new SoundAspect("ChargeReady0False", "ChargeReady", "RevolverSounds\\RevolverPiercer"));
-        result.AddAspect(new SoundAspect("ChargingUp0False", "ChargingUp", "RevolverSounds\\RevolverPiercer"));
-        result.AddAspect(new SoundAspect("ClickCancel0False", "ClickCancel", "RevolverSounds\\RevolverPiercer"));
-        result.AddAspect(new SoundAspect("RevolverShootSounds0False", "ShootSounds", "RevolverSounds\\RevolverPiercer"));
-        result.AddAspect(new SoundAspect("RevolverSuperShootSounds0False", "SuperShootSounds", "RevolverSounds\\RevolverPiercer"));
+        result.AddAspect(new SoundAspect("ChargeLoop0False", "ChargeLoop", "RevolverSounds\\RevolverPiercer", new string[] { "Charging" }));
+        result.AddAspect(new SoundAspect("ChargeReady0False", "ChargeReady", "RevolverSounds\\RevolverPiercer", new string[] { "BeepBeep_high" }));
+        result.AddAspect(new SoundAspect("ChargingUp0False", "ChargingUp", "RevolverSounds\\RevolverPiercer", new string[] { "Charging" }));
+        result.AddAspect(new SoundAspect("ClickCancel0False", "ClickCancel", "RevolverSounds\\RevolverPiercer", new string[] { "click" }));
+        result.AddAspect(new SoundAspect("RevolverShootSounds0False", "ShootSounds", "RevolverSounds\\RevolverPiercer", new string[] { "Shoot1", "Shoot1c3", "Shoot1c4" }));
+        result.AddAspect(new SoundAspect("RevolverSuperShootSounds0False", "SuperShootSounds", "RevolverSounds\\RevolverPiercer", new string[] { "Shoot2", "Shoot2b3" }));
 
-        result.AddAspect(new SoundAspect("ChargeLoop0True", "ChargeLoop", "RevolverSounds\\RevolverPiercerAlt"));
-        result.AddAspect(new SoundAspect("ChargeReady0True", "ChargeReady", "RevolverSounds\\RevolverPiercerAlt"));
-        result.AddAspect(new SoundAspect("ChargingUp0True", "ChargingUp", "RevolverSounds\\RevolverPiercerAlt"));
-        result.AddAspect(new SoundAspect("ClickCancel0True", "ClickCancel", "RevolverSounds\\RevolverPiercerAlt"));
-        result.AddAspect(new SoundAspect("RevolverShootSounds0True", "ShootSounds", "RevolverSounds\\RevolverPiercerAlt"));
-        result.AddAspect(new SoundAspect("RevolverSuperShootSounds0True", "SuperShootSounds", "RevolverSounds\\RevolverPiercerAlt"));
+        result.AddAspect(new SoundAspect("ChargeLoop0True", "ChargeLoop", "RevolverSounds\\RevolverPiercerAlt", new string[] { "Charging" }));
+        result.AddAspect(new SoundAspect("ChargeReady0True", "ChargeReady", "RevolverSounds\\RevolverPiercerAlt", new string[] { "BeepBeep_high" }));
+        result.AddAspect(new SoundAspect("ChargingUp0True", "ChargingUp", "RevolverSounds\\RevolverPiercerAlt", new string[] { "Charging" }));
+        result.AddAspect(new SoundAspect("ClickCancel0True", "ClickCancel", "RevolverSounds\\RevolverPiercerAlt", new string[] { "click" }));
+        result.AddAspect(new SoundAspect("RevolverShootSounds0True", "ShootSounds", "RevolverSounds\\RevolverPiercerAlt", new string[] { "AltRevolverShoot2D" }));
+        result.AddAspect(new SoundAspect("RevolverSuperShootSounds0True", "SuperShootSounds", "RevolverSounds\\RevolverPiercerAlt", new string[] { "AltRevolverShoot1D" }));
 
-        //result.AddAspect(new SoundAspect("ShotgunChargingSounds", "ShotgunSounds"));
-        //result.AddAspect(new SoundAspect("ShotgunChargingStartSounds", "ShotgunSounds"));
-        //result.AddAspect(new SoundAspect("ShotgunEjectSounds", "ShotgunSounds"));
-        //result.AddAspect(new SoundAspect("ShotgunHeatHissSounds", "ShotgunSounds"));
-        //result.AddAspect(new SoundAspect("ShotgunOverchargedBeepSounds", "ShotgunSounds"));
-        //result.AddAspect(new SoundAspect("ShotgunPumpChargeSounds", "ShotgunSounds"));
-        //result.AddAspect(new SoundAspect("ShotgunPump1Sounds", "ShotgunSounds"));
-        //result.AddAspect(new SoundAspect("ShotgunPump2Sounds", "ShotgunSounds"));
-        //result.AddAspect(new SoundAspect("ShotgunShootSounds", "ShotgunSounds"));
+        result.AddAspect(new SoundAspect("ShotgunShootSounds0", "ShotgunShootSounds", "ShotgunSounds\\ShotgunBlue", new string[] { "Steampunk Weapons - Shotgun 2 - Shot - 03" }));
+        result.AddAspect(new SoundAspect("ShotgunChargeLoop", "ChargeLoop", "ShotgunSounds\\ShotgunBlue", new string[] { "electricCharge" }));
+        result.AddAspect(new SoundAspect("CoreEject", "ShotgunSounds\\ShotgunBlue", true, new string[] { "Steampunk Weapons - Shotgun 2 - Shot - 05" }));
+        result.AddAspect(new SoundAspect("CoreEjectFlick", "ShotgunSounds\\ShotgunBlue", true, new string[] { "Mechanism -  Designed Mega Steam Lever-005b" }));
+        result.AddAspect(new SoundAspect("CoreEjectReload", "ShotgunSounds\\ShotgunBlue", true, new string[] { "Impacts_SIMPLE_003" }));
+        result.AddAspect(new SoundAspect("MainShotReload", "ShotgunSounds\\ShotgunBlue", true, new string[] { "Mechanism -  Designed Mega Steam Lever-0054" }));
+        result.AddAspect(new SoundAspect("HeatHiss", "ShotgunSounds\\ShotgunBlue", true, new string[] { "Mechanism -  Designed Mega Steam Lever-002" }));
+
+        result.AddAspect(new SoundAspect("ShotgunShootSounds1", "ShotgunShootSounds", "ShotgunSounds\\ShotgunGreen", new string[] { "Steampunk Weapons - Shotgun 2 - Shot - 05" }));
+        result.AddAspect(new SoundAspect("ShotgunCharge", "ShotgunSounds\\ShotgunGreen", true, new string[] { "pumpCharge" }));
+        result.AddAspect(new SoundAspect("ShotgunPump1", "ShotgunSounds\\ShotgunGreen", true, new string[] { "shotgunpump1" }));
+        result.AddAspect(new SoundAspect("ShotgunPump2", "ShotgunSounds\\ShotgunGreen", true, new string[] { "shotgunpump2" }));
+        result.AddAspect(new SoundAspect("OverCharged", "ShotgunSounds\\ShotgunGreen", true, new string[] { "CSFX-2_Mechanics_45" }));
 
         allSoundPacks.Add(name, result);
         return result;
     }
 
-    public static void SetCurrentSoundPack(string name)
+    public static SoundPack[] GetAllSoundPacks()
     {
-        if (name == "STOCK")
-            currentSoundPack = null;
-        else if (allSoundPacks.ContainsKey(name))
-            currentSoundPack = allSoundPacks[name];
-        else
-            Debug.Log("Tried to set current soundpack to " + name + " but it wasn't found!");
+        return (SoundPack[])allSoundPacks.Values.ToArray().Clone();
     }
 
-    public static AudioClip[] GetAllAudioClips(string name)
+    public static void SetCurrentSoundPack(string name)
     {
+        if (allSoundPacks.ContainsKey(name))
+        {
+            currentSoundPack = allSoundPacks[name];
+            currentSoundPackName = name;
+        }
+        else
+            Debug.Log("Tried to set current soundpack to " + name + " but it wasn't found!");
+        foreach (Revolver r in Resources.FindObjectsOfTypeAll<Revolver>())
+        {
+            Inject_RevolverSounds.Postfix(r);
+        }
+        foreach (Railcannon r in Resources.FindObjectsOfTypeAll<Railcannon>())
+        {
+            Inject_RailcannonSounds.Postfix(r);
+        }
+        foreach (Shotgun s in Resources.FindObjectsOfTypeAll<Shotgun>())
+        {
+            Inject_ShotgunSounds.Postfix(s);
+        }
+    }
+
+    public static void GetAllAudioClips(string name, ref AudioClip[] clips)
+    {
+        if (!stockLoadedAspects.Contains(name))
+        {
+            stockLoadedAspects.Add(name);
+            foreach (AudioClip clip in clips)
+                allSoundPacks["Stock"].GetAspect(name).allClips.Add(clip);
+        }
         if (currentSoundPack != null)
-            return currentSoundPack.GetAllAudioClipsOfAspect(name);
-        return null;
+        {
+            AudioClip[] allClips = currentSoundPack.GetAllAudioClipsOfAspect(name);
+            if (allClips != null)
+                clips = allClips;
+        }
     }
 
     public static void SetAudioSourceClip(AudioSource source, string name)
@@ -133,6 +200,11 @@ public static class SoundPackController
         {
             Debug.LogError("Got a null audiosource while handling " + name);
             return;
+        }
+        if (name != "Random" && !stockLoadedAspects.Contains(name) && source.clip != null)
+        {
+            stockLoadedAspects.Add(name);
+            allSoundPacks["Stock"].GetAspect(name).allClips.Add(source.clip);
         }
         if (currentSoundPack != null)
         {
@@ -144,6 +216,11 @@ public static class SoundPackController
 
     public static void SetAudioClip(ref AudioClip clip, string name)
     {
+        if (!stockLoadedAspects.Contains(name))
+        {
+            stockLoadedAspects.Add(name);
+            allSoundPacks["Stock"].GetAspect(name).allClips.Add(clip);
+        }
         if (currentSoundPack != null)
         {
             AudioClip newClip = currentSoundPack.GetRandomClipFromAspect(name);
@@ -230,12 +307,21 @@ public static class SoundPackController
 
         public AudioClip GetRandomClipFromAspect(string name)
         {
+            if (name == "Random")
+            {
+                SoundAspect randomAspect = allAspects.Values.ToList()[UnityEngine.Random.Range(0, allAspects.Values.Count - 1)];
+                while (randomAspect.allClips.Count <= 0)
+                    randomAspect = allAspects.Values.ToList()[UnityEngine.Random.Range(0, allAspects.Values.Count - 1)];
+                if (randomAspect.allClips.Count == 1)
+                    return randomAspect.allClips[0];
+                return randomAspect.allClips[UnityEngine.Random.Range(0, randomAspect.allClips.Count - 1)];
+            }
             if (!allAspects.ContainsKey(name) || allAspects[name].allClips.Count <= 0)
                 return null;
             List<AudioClip> allClips = allAspects[name].allClips;
-            if (allClips.Count == 0)
+            if (allClips.Count == 1)
                 return allClips[0];
-            return allAspects[name].allClips[Random.Range(0, allAspects[name].allClips.Count - 1)];
+            return allAspects[name].allClips[UnityEngine.Random.Range(0, allAspects[name].allClips.Count - 1)];
         }
 
         public AudioClip[] GetAllAudioClipsOfAspect(string name)
@@ -251,72 +337,77 @@ public static class SoundPackController
                 return null;
             return allAspects[name];
         }
+    }
 
-        public List<AudioClip> CoinHitSounds = new List<AudioClip>();
-        public List<AudioClip> CoinThrownSounds = new List<AudioClip>();
-        public List<AudioClip> RevolverChargeShootSounds = new List<AudioClip>();
-        public List<AudioClip> RevolverChargeSounds = new List<AudioClip>();
-        public List<AudioClip> RevolverCoinReadySounds = new List<AudioClip>();
-        public List<AudioClip> RevolverShootSounds = new List<AudioClip>();
-        public List<AudioClip> RevolverSlabChargeShootSounds = new List<AudioClip>();
-        public List<AudioClip> RevolverSlabCockSounds = new List<AudioClip>();
-        public List<AudioClip> RevolverSlabShootSounds = new List<AudioClip>();
+    public class SoundAspect
+    {
+        public string name;
+        public string path;
+        public string[] stockPath;
+        public List<AudioClip> allClips = new List<AudioClip>();
 
-        public List<AudioClip> ShotgunChargeSounds = new List<AudioClip>();
-        public List<AudioClip> ShotgunEjectSounds = new List<AudioClip>();
-        public List<AudioClip> ShotgunHeatHissSounds = new List<AudioClip>();
-        public List<AudioClip> ShotgunOverchargedSounds = new List<AudioClip>();
-        public List<AudioClip> ShotgunPumpSounds = new List<AudioClip>();
-        public List<AudioClip> ShotgunShootSounds = new List<AudioClip>();
+        public SoundAspect(string name, string path, bool inRootDirectory, string[] stockPath)
+        {
+            this.name = name;
+            if (inRootDirectory)
+                this.path = "\\" + path + "\\" + name + "\\";
+            else
+                this.path = "\\" + path + "\\" + name.Substring(0, name.Length - 1) + "\\";
+            this.stockPath = stockPath;
+        }
 
-        public List<AudioClip> NailgunBarrelRotateSounds = new List<AudioClip>();
-        public List<AudioClip> NailgunMagnetReadyounds = new List<AudioClip>();
-        public List<AudioClip> NailgunOverheatSounds = new List<AudioClip>();
-        public List<AudioClip> NailgunShootSawSounds = new List<AudioClip>();
-        public List<AudioClip> NailgunShootSounds = new List<AudioClip>();
+        public SoundAspect(string name, string folderName, string path, string[] stockPath)
+        {
+            this.name = name;
+            this.path = "\\" + path + "\\" + folderName + "\\";
+            this.stockPath = stockPath;
+        }
     }
 }
 
-public class SoundAspect
-{
-    public string name;
-    public string path;
-    public List<AudioClip> allClips = new List<AudioClip>();
-
-    public SoundAspect(string name, string path, bool inRootDirectory)
-    {
-        this.name = name;
-        if (inRootDirectory)
-            this.path = "\\" + path + "\\" + name + "\\";
-        else
-            this.path = "\\" + path + "\\" + name.Substring(0, name.Length - 1) + "\\";
-    }
-
-    public SoundAspect(string name, string folderName, string path)
-    {
-        this.name = name;
-        this.path = "\\" + path + "\\" + folderName + "\\";
-    }
-}
- 
 #region HARMONY_PATCHES
 [HarmonyPatch(typeof(ShopZone), "Start")]
 public static class Inject_SoundPackShops
 {
-    public static void Postfix(ShopMother __instance)
+    public static void Prefix(ShopZone __instance)
     {
         if (__instance.transform.Find("Canvas").Find("Weapons") != null) // just a sanity check that we're not messing with a testament
         {
-            Transform enemies = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Enemies"), __instance.transform.Find("Canvas"));
+            Transform enemies = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Enemies"), __instance.transform.Find("Canvas").Find("Weapons"));
             enemies.Find("BackButton (2)").gameObject.SetActive(false);
             Transform contentParent = enemies.Find("Panel").Find("Scroll View").Find("Viewport").Find("Content");
-            Transform packTemplate = contentParent.Find("Enemy Button Template");
-            packTemplate.gameObject.tag = "Body"; // it's only body cuz it's a builtin tag that shouldn't affect behaviour
-            GameObject newText = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Weapons").Find("ArmButton").gameObject, packTemplate.transform.GetChild(0).GetChild(0).GetChild(0));
-            GameObject.Destroy(newText.GetComponent<ShopButton>());
-            newText.transform.localPosition = Vector3.zero;
-            newText.transform.localScale = new Vector3(0.4167529f, 0.4167529f, 0.4167529f);
-            EnemyInfoPage page = enemies.GetComponentInChildren<EnemyInfoPage>(true);
+
+            Debug.Log("Children in content is " + contentParent.childCount);
+
+            GameObject packTemplate = contentParent.Find("Enemy Button Template").gameObject;
+            for (int i = 0; i < contentParent.childCount; i++)
+                contentParent.GetChild(i).gameObject.SetActive(false);
+            packTemplate.gameObject.SetActive(true);
+            foreach (SoundPackController.SoundPack pack in SoundPackController.GetAllSoundPacks())
+            {
+                GameObject newPack = GameObject.Instantiate(packTemplate, contentParent);
+                newPack.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = Color.gray;
+                newPack.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false);
+                ShopButton sButton = newPack.GetComponent<ShopButton>();
+                sButton.toActivate = new GameObject[] { };
+                newPack.GetComponent<ShopButton>().toDeactivate = new GameObject[] { };
+                newPack.GetComponent<Button>().onClick.AddListener(delegate
+                {
+                    SoundPackController.SetCurrentSoundPack(pack.name);
+                    GameObject.Instantiate(sButton.clickSound);
+                    AudioSource source = GameObject.Instantiate(sButton.clickSound).GetComponent<AudioSource>();
+                    SoundPackController.SetAudioSourceClip(source, "Random");
+                    source.volume = 1f;
+                    source.Play();
+                });
+                GameObject newText = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Weapons").Find("ArmButton").gameObject, newPack.transform.GetChild(0).GetChild(0).GetChild(0)); // yes I tried making a "prefab" out of this and instantiating it, didn't work
+                GameObject.Destroy(newText.GetComponent<ShopButton>());
+                newText.transform.localPosition = Vector3.zero;
+                newText.transform.localScale = new Vector3(0.4167529f, 0.4167529f, 0.4167529f);
+                newText.GetComponentInChildren<Text>().text = pack.name;
+                newText.transform.SetParent(newPack.transform.GetChild(0).GetChild(0)); // so I got the values by finding the 3rd child, but now I set it to be inactive sooooooo
+            }
+            packTemplate.SetActive(false);
 
             Transform newArmsButton = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Weapons").Find("ArmButton").gameObject, __instance.transform.Find("Canvas").Find("Weapons")).transform;
             newArmsButton.localPosition = new Vector3(-180f, -144.7f, -45.00326f);
@@ -328,8 +419,16 @@ public static class Inject_SoundPackShops
                 __instance.transform.Find("Canvas").Find("Weapons").Find("RevolverWindow").gameObject,
                 __instance.transform.Find("Canvas").Find("Weapons").Find("ShotgunWindow").gameObject,
                 __instance.transform.Find("Canvas").Find("Weapons").Find("NailgunWindow").gameObject,
-                __instance.transform.Find("Canvas").Find("Weapons").Find("RailcannonWindow").gameObject
+                __instance.transform.Find("Canvas").Find("Weapons").Find("RailcannonWindow").gameObject,
+                __instance.transform.Find("Canvas").Find("Weapons").Find("ArmWindow").gameObject
             };
+
+            __instance.transform.Find("Canvas").Find("Weapons").Find("BackButton (1)").gameObject.GetComponent<ShopButton>().toDeactivate = __instance.transform.Find("Canvas").Find("Weapons").Find("BackButton (1)").gameObject.GetComponent<ShopButton>().toDeactivate.AddToArray(enemies.gameObject);
+            __instance.transform.Find("Canvas").Find("Weapons").Find("RevolverButton").gameObject.GetComponent<ShopButton>().toDeactivate = __instance.transform.Find("Canvas").Find("Weapons").Find("RevolverButton").gameObject.GetComponent<ShopButton>().toDeactivate.AddToArray(enemies.gameObject);
+            __instance.transform.Find("Canvas").Find("Weapons").Find("ShotgunButton").gameObject.GetComponent<ShopButton>().toDeactivate = __instance.transform.Find("Canvas").Find("Weapons").Find("ShotgunButton").gameObject.GetComponent<ShopButton>().toDeactivate.AddToArray(enemies.gameObject);
+            __instance.transform.Find("Canvas").Find("Weapons").Find("NailgunButton").gameObject.GetComponent<ShopButton>().toDeactivate = __instance.transform.Find("Canvas").Find("Weapons").Find("NailgunButton").gameObject.GetComponent<ShopButton>().toDeactivate.AddToArray(enemies.gameObject);
+            __instance.transform.Find("Canvas").Find("Weapons").Find("RailcannonButton").gameObject.GetComponent<ShopButton>().toDeactivate = __instance.transform.Find("Canvas").Find("Weapons").Find("RailcannonButton").gameObject.GetComponent<ShopButton>().toDeactivate.AddToArray(enemies.gameObject);
+            __instance.transform.Find("Canvas").Find("Weapons").Find("ArmButton").gameObject.GetComponent<ShopButton>().toDeactivate = __instance.transform.Find("Canvas").Find("Weapons").Find("ArmButton").gameObject.GetComponent<ShopButton>().toDeactivate.AddToArray(enemies.gameObject);
         }
     }
 }
@@ -337,20 +436,25 @@ public static class Inject_SoundPackShops
 [HarmonyPatch(typeof(Revolver), "Start")]
 public static class Inject_RevolverSounds
 {
-    public static bool Prefix(Revolver __instance)
+    public static void Postfix(Revolver __instance)
     {
-        AudioClip[] clips = SoundPackController.GetAllAudioClips("RevolverShootSounds" + __instance.gunVariation + __instance.altVersion.ToString());
-        if (clips != null)
-            __instance.gunShots = clips;
+        SoundPackController.GetAllAudioClips("RevolverShootSounds" + __instance.gunVariation + __instance.altVersion.ToString(), ref __instance.gunShots);
         if (__instance.gunVariation == 0)
         {
-            clips = SoundPackController.GetAllAudioClips("RevolverSuperShootSounds" + __instance.gunVariation + __instance.altVersion.ToString());
-            if (clips != null)
-                __instance.superGunShots = clips;
+            SoundPackController.GetAllAudioClips("RevolverSuperShootSounds" + __instance.gunVariation + __instance.altVersion.ToString(), ref __instance.superGunShots);
             SoundPackController.SetAudioClip(ref __instance.chargingSound, "ChargingUp" + __instance.gunVariation + __instance.altVersion.ToString());
             SoundPackController.SetAudioClip(ref __instance.chargedSound, "ChargeReady" + __instance.gunVariation + __instance.altVersion.ToString());
-            SoundPackController.SetAudioSourceClip(__instance.gunBarrel.transform.GetChild(0).gameObject.GetComponent<AudioSource>(), "ChargeLoop" + __instance.gunVariation + __instance.altVersion.ToString());
-            SoundPackController.SetAudioSourceClip(__instance.GetComponentInChildren<Turn>().gameObject.GetComponent<AudioSource>(), "ClickCancel" + __instance.gunVariation + __instance.altVersion.ToString());
+            if (__instance.gunBarrel == null)
+            {
+                foreach (AudioSource source in __instance.GetComponentsInChildren<AudioSource>(true))
+                    if (source.name == "ChargeEffect")
+                        SoundPackController.SetAudioSourceClip(source, "ChargeLoop" + __instance.gunVariation + __instance.altVersion.ToString());
+            }
+            else
+                SoundPackController.SetAudioSourceClip(__instance.gunBarrel.transform.GetChild(0).GetComponent<AudioSource>(), "ChargeLoop" + __instance.gunVariation + __instance.altVersion.ToString());
+            foreach (AudioSource source in __instance.GetComponentsInChildren<AudioSource>(true))
+                if (source.name == "Bone_001")
+                    SoundPackController.SetAudioSourceClip(source, "ClickCancel" + __instance.gunVariation + __instance.altVersion.ToString());
         }
         else
         {
@@ -358,6 +462,7 @@ public static class Inject_RevolverSounds
             SoundPackController.SetAudioSourceClip(__instance.GetComponentInChildren<Canvas>().gameObject.GetComponent<AudioSource>(), "CoinReady" + __instance.gunVariation + __instance.altVersion.ToString());
             SoundPackController.SetAudioSourceClip(__instance.coin.GetComponent<AudioSource>(), "CoinFlip" + __instance.gunVariation + __instance.altVersion.ToString());
             SoundPackController.SetAudioSourceClip(__instance.coin.transform.GetChild(0).GetComponent<AudioSource>(), "CoinSpin" + __instance.gunVariation + __instance.altVersion.ToString());
+
             Coin coin = __instance.coin.GetComponent<Coin>();
             SoundPackController.SetAudioSourceClip(coin.flash.GetComponent<AudioSource>(), "CoinFlip" + __instance.gunVariation + __instance.altVersion.ToString());
             SoundPackController.SetAudioSourceClip(coin.coinBreak.GetComponent<AudioSource>(), "CoinBreak" + __instance.gunVariation + __instance.altVersion.ToString());
@@ -365,42 +470,45 @@ public static class Inject_RevolverSounds
             SoundPackController.SetAudioSourceClip(coin.coinHitSound.GetComponents<AudioSource>()[1], "CoinFlip" + __instance.gunVariation + __instance.altVersion.ToString());
             SoundPackController.SetAudioSourceClip(coin.chargeEffect.GetComponent<AudioSource>(), "CoinFlashLoop" + __instance.gunVariation + __instance.altVersion.ToString());
         }
-        return true;
     }
 }
 
-//[HarmonyPatch(typeof(Nailgun), "FixedUpdate")]
-//public static class Inject_NailgunSounds
-//{
-//    public static void Prefix(Nailgun __instance)
-//    {
-//        //((AudioSource)(Traverse.Create(__instance).Field("aud").GetValue())).clip = Plugin.allClips[UnityEngine.Random.Range(0, Plugin.allClips.Count - 1)];
-//        if (__instance.lastShotSound)
-//            __instance.lastShotSound.GetComponent<AudioSource>().clip = Plugin.allClips[UnityEngine.Random.Range(0, Plugin.allClips.Count - 1)];
-//    }
-//}
+[HarmonyPatch(typeof(Shotgun), "Start")]
+public static class Inject_ShotgunSounds
+{
+    public static void Postfix(Shotgun __instance)
+    {
+        SoundPackController.SetAudioSourceClip(__instance.pumpChargeSound.GetComponent<AudioSource>(), "ShotgunCharge");
+        SoundPackController.SetAudioSourceClip(__instance.warningBeep.GetComponent<AudioSource>(), "OverCharged");
+        SoundPackController.SetAudioSourceClip(__instance.chargeSoundBubble.GetComponent<AudioSource>(), "ShotgunChargeLoop");
+        AudioSource heatSinkAud = (AudioSource)Traverse.Create(__instance).Field("heatSinkAud").GetValue();
+        if (heatSinkAud == null)
+            heatSinkAud = __instance.heatSinkSMR.GetComponent<AudioSource>();
+        SoundPackController.SetAudioSourceClip(heatSinkAud, "HeatHiss");
+        SoundPackController.SetAudioClip(ref __instance.clickChargeSound, "CoreEjectFlick");
+        SoundPackController.SetAudioClip(ref __instance.smackSound, "CoreEjectReload");
+        SoundPackController.SetAudioClip(ref __instance.clickSound, "MainShotReload");
+    }
+}
 
 [HarmonyPatch(typeof(Shotgun), "Shoot")]
 public static class Inject_ShotgunShootSounds
 {
     public static bool Prefix(Shotgun __instance)
     {
-        SoundPackController.SetAudioClip(ref __instance.shootSound, "ShotgunShootSounds");
+        SoundPackController.SetAudioClip(ref __instance.shootSound, "ShotgunShootSounds" + __instance.variation);
         return true;
     }
 }
 
-[HarmonyPatch(typeof(Shotgun), "Update")]
-public static class Inject_ShotgunChargingSounds
+[HarmonyPatch(typeof(Shotgun), "ShootSinks")]
+public static class Inject_ShotgunShootHeatSinkSounds
 {
-    public static void Postfix(Shotgun __instance)
+    public static bool Prefix(Shotgun __instance)
     {
-        if (__instance.variation == 0)
-        {
-            AudioSource source = Traverse.Create(__instance).Field("tempChargeSound").GetValue() as AudioSource;
-            if (source != null)
-                SoundPackController.SetAudioSourceClip(source, "ShotgunChargingSounds"); 
-        }
+        SoundPackController.SetAudioSourceClip(__instance.grenadeSoundBubble.GetComponent<AudioSource>(), "CoreEject");
+        SoundPackController.SetAudioClip(ref __instance.shootSound, "ShotgunShootSounds" + __instance.variation);
+        return true;
     }
 }
 
@@ -409,7 +517,7 @@ public static class Inject_ShotgunPump1Sounds
 {
     public static bool Prefix(Shotgun __instance)
     {
-        SoundPackController.SetAudioClip(ref __instance.pump1sound, "ShotgunPump1Sounds");
+        SoundPackController.SetAudioClip(ref __instance.pump1sound, "ShotgunPump1");
         return true;
     }
 }
@@ -419,7 +527,7 @@ public static class Inject_ShotgunPump2Sounds
 {
     public static bool Prefix(Shotgun __instance)
     {
-        SoundPackController.SetAudioClip(ref __instance.pump2sound, "ShotgunPump2Sounds");
+        SoundPackController.SetAudioClip(ref __instance.pump2sound, "ShotgunPump2");
         return true;
     }
 }
@@ -447,7 +555,10 @@ public static class Inject_RailcannonSounds
 {
     public static void Postfix(Railcannon __instance)
     {
-        SoundPackController.SetAudioSourceClip((AudioSource)Traverse.Create(__instance).Field("fullAud").GetValue(), "RailcannonIdleSounds" + __instance.variation);
+        AudioSource fullAud = (AudioSource)Traverse.Create(__instance).Field("fullAud").GetValue();
+        if (fullAud == null)
+            fullAud = __instance.fullCharge.GetComponent<AudioSource>();
+        SoundPackController.SetAudioSourceClip(fullAud, "RailcannonIdleSounds" + __instance.variation);
     }
 }
 
