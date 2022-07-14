@@ -82,69 +82,71 @@ public static class SoundPackController
     {
         SoundPack result = new SoundPack(name);
 
-        result.AddAspect(new SoundAspect("RailcannonChargedSounds", "RailcannonSounds", true, new string[] { "RailcannonFullClickAndCharge" }));
+        result.AddAspect(new SoundAspect("RailcannonChargedSounds", "RailcannonSounds", true));
 
-        result.AddAspect(new SoundAspect("RailcannonClickSounds0", "RailcannonSounds\\RailcannonBlue", false, new string[] { "RailcannonPipClick" }));
-        result.AddAspect(new SoundAspect("RailcannonIdleSounds0", "RailcannonSounds\\RailcannonBlue", false, new string[] { "RailcannonFull" }));
-        result.AddAspect(new SoundAspect("RailcannonShootSounds0", "RailcannonSounds\\RailcannonBlue", false, new string[] { "RailcannonFire4" }));
-        result.AddAspect(new SoundAspect("RailcannonWhirSounds0", "RailcannonSounds\\RailcannonBlue", false, new string[] { "RailcannonPipidle" }));
+        result.AddAspect(new SoundAspect("RailcannonClickSounds0", "RailcannonSounds\\RailcannonBlue", false));
+        result.AddAspect(new SoundAspect("RailcannonIdleSounds0", "RailcannonSounds\\RailcannonBlue", false));
+        result.AddAspect(new SoundAspect("RailcannonShootSounds0", "RailcannonSounds\\RailcannonBlue", false));
+        result.AddAspect(new SoundAspect("RailcannonWhirSounds0", "RailcannonSounds\\RailcannonBlue", false));
 
-        result.AddAspect(new SoundAspect("RailcannonClickSounds1", "RailcannonSounds\\RailcannonGreen", false, new string[] { "RailcannonPipClick" }));
-        result.AddAspect(new SoundAspect("RailcannonIdleSounds1", "RailcannonSounds\\RailcannonGreen", false, new string[] { "RailcannonFull" }));
-        result.AddAspect(new SoundAspect("RailcannonShootSounds1", "RailcannonSounds\\RailcannonGreen", false, new string[] { "RailcannonFire4" }));
-        result.AddAspect(new SoundAspect("RailcannonWhirSounds1", "RailcannonSounds\\RailcannonGreen", false, new string[] { "RailcannonPipidle" }));
+        result.AddAspect(new SoundAspect("RailcannonClickSounds1", "RailcannonSounds\\RailcannonGreen", false));
+        result.AddAspect(new SoundAspect("RailcannonIdleSounds1", "RailcannonSounds\\RailcannonGreen", false));
+        result.AddAspect(new SoundAspect("RailcannonShootSounds1", "RailcannonSounds\\RailcannonGreen", false));
+        result.AddAspect(new SoundAspect("RailcannonWhirSounds1", "RailcannonSounds\\RailcannonGreen", false));
 
-        result.AddAspect(new SoundAspect("RailcannonClickSounds2", "RailcannonSounds\\RailcannonRed", false, new string[] { "RailcannonPipClick" }));
-        result.AddAspect(new SoundAspect("RailcannonIdleSounds2", "RailcannonSounds\\RailcannonRed", false, new string[] { "RailcannonFull" }));
-        result.AddAspect(new SoundAspect("RailcannonShootSounds2", "RailcannonSounds\\RailcannonRed", false, new string[] { "RailcannonFire5" }));
-        result.AddAspect(new SoundAspect("RailcannonRedWindDownSounds2", "RailcannonSounds\\RailcannonRed", false, new string[] { "Bluezone-Autobots-shutdown-003" }));
-        result.AddAspect(new SoundAspect("RailcannonWhirSounds2", "RailcannonSounds\\RailcannonRed", false, new string[] { "RailcannonPipidle" }));
+        result.AddAspect(new SoundAspect("RailcannonClickSounds2", "RailcannonSounds\\RailcannonRed", false));
+        result.AddAspect(new SoundAspect("RailcannonIdleSounds2", "RailcannonSounds\\RailcannonRed", false));
+        result.AddAspect(new SoundAspect("RailcannonShootSounds2", "RailcannonSounds\\RailcannonRed", false));
+        result.AddAspect(new SoundAspect("RailcannonRedWindDownSounds2", "RailcannonSounds\\RailcannonRed", false));
+        result.AddAspect(new SoundAspect("RailcannonWhirSounds2", "RailcannonSounds\\RailcannonRed", false));
 
-        result.AddAspect(new SoundAspect("CoinBreak1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman", new string[] { "Twirling" }));
-        result.AddAspect(new SoundAspect("CoinFlashLoop1False", "CoinFlashLoop", "RevolverSounds\\RevolverMarksman", new string[] { "coinflashloop" }));
-        result.AddAspect(new SoundAspect("CoinFlip1False", "CoinFlip", "RevolverSounds\\RevolverMarksman", new string[] { "coinflip" }));
-        result.AddAspect(new SoundAspect("CoinReady1False", "CoinReady", "RevolverSounds\\RevolverMarksman", new string[] { "Bell_10_b" }));
-        result.AddAspect(new SoundAspect("CoinSpin1False", "CoinSpin", "RevolverSounds\\RevolverMarksman", new string[] { "coinspin" }));
-        result.AddAspect(new SoundAspect("CoinTwirl1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman", new string[] { "Twirling" }));
-        result.AddAspect(new SoundAspect("CoinRicochet1False", "Ricochet", "RevolverSounds\\RevolverMarksman", new string[] { "Ricochet" }));
-        result.AddAspect(new SoundAspect("RevolverShootSounds1False", "ShootSounds", "RevolverSounds\\RevolverMarksman", new string[] { "Shoot1", "Shoot1c3", "Shoot1c4" }));
+        result.AddAspect(new SoundAspect("CoinBreak1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman"));
+        result.AddAspect(new SoundAspect("CoinFlashLoop1False", "CoinFlashLoop", "RevolverSounds\\RevolverMarksman"));
+        result.AddAspect(new SoundAspect("CoinFlip1False", "CoinFlip", "RevolverSounds\\RevolverMarksman"));
+        result.AddAspect(new SoundAspect("CoinReady1False", "CoinReady", "RevolverSounds\\RevolverMarksman"));
+        result.AddAspect(new SoundAspect("CoinSpin1False", "CoinSpin", "RevolverSounds\\RevolverMarksman"));
+        result.AddAspect(new SoundAspect("CoinTwirl1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman"));
+        result.AddAspect(new SoundAspect("CoinRicochet1False", "Ricochet", "RevolverSounds\\RevolverMarksman"));
+        result.AddAspect(new SoundAspect("RevolverShootSounds1False", "ShootSounds", "RevolverSounds\\RevolverMarksman"));
 
-        result.AddAspect(new SoundAspect("CoinBreak1True", "CoinTwirl", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "Twirling" }));
-        result.AddAspect(new SoundAspect("CoinFlashLoop1True", "CoinFlashLoop", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "coinflashloop" }));
-        result.AddAspect(new SoundAspect("CoinFlip1True", "CoinFlip", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "coinflip" }));
-        result.AddAspect(new SoundAspect("CoinReady1True", "CoinReady", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "Bell_10_b" }));
-        result.AddAspect(new SoundAspect("CoinSpin1True", "CoinSpin", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "coinspin" }));
-        result.AddAspect(new SoundAspect("CoinTwirl1True", "CoinTwirl", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "Twirling" }));
-        result.AddAspect(new SoundAspect("CoinRicochet1True", "Ricochet", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "Ricochet" }));
-        result.AddAspect(new SoundAspect("RevolverShootSounds1True", "ShootSounds", "RevolverSounds\\RevolverMarksmanAlt", new string[] { "AltRevolverShoot1D" }));
+        result.AddAspect(new SoundAspect("CoinBreak1True", "CoinTwirl", "RevolverSounds\\RevolverMarksmanAlt"));
+        result.AddAspect(new SoundAspect("CoinFlashLoop1True", "CoinFlashLoop", "RevolverSounds\\RevolverMarksmanAlt"));
+        result.AddAspect(new SoundAspect("CoinFlip1True", "CoinFlip", "RevolverSounds\\RevolverMarksmanAlt"));
+        result.AddAspect(new SoundAspect("CoinReady1True", "CoinReady", "RevolverSounds\\RevolverMarksmanAlt"));
+        result.AddAspect(new SoundAspect("CoinSpin1True", "CoinSpin", "RevolverSounds\\RevolverMarksmanAlt"));
+        result.AddAspect(new SoundAspect("CoinTwirl1True", "CoinTwirl", "RevolverSounds\\RevolverMarksmanAlt"));
+        result.AddAspect(new SoundAspect("CoinRicochet1True", "Ricochet", "RevolverSounds\\RevolverMarksmanAlt"));
+        result.AddAspect(new SoundAspect("RevolverShootSounds1True", "ShootSounds", "RevolverSounds\\RevolverMarksmanAlt"));
+        result.AddAspect(new SoundAspect("HammerClick1", "HammerClick", "RevolverSounds\\RevolverMarksmanAlt"));
 
-        result.AddAspect(new SoundAspect("ChargeLoop0False", "ChargeLoop", "RevolverSounds\\RevolverPiercer", new string[] { "Charging" }));
-        result.AddAspect(new SoundAspect("ChargeReady0False", "ChargeReady", "RevolverSounds\\RevolverPiercer", new string[] { "BeepBeep_high" }));
-        result.AddAspect(new SoundAspect("ChargingUp0False", "ChargingUp", "RevolverSounds\\RevolverPiercer", new string[] { "Charging" }));
-        result.AddAspect(new SoundAspect("ClickCancel0False", "ClickCancel", "RevolverSounds\\RevolverPiercer", new string[] { "click" }));
-        result.AddAspect(new SoundAspect("RevolverShootSounds0False", "ShootSounds", "RevolverSounds\\RevolverPiercer", new string[] { "Shoot1", "Shoot1c3", "Shoot1c4" }));
-        result.AddAspect(new SoundAspect("RevolverSuperShootSounds0False", "SuperShootSounds", "RevolverSounds\\RevolverPiercer", new string[] { "Shoot2", "Shoot2b3" }));
+        result.AddAspect(new SoundAspect("ChargeLoop0False", "ChargeLoop", "RevolverSounds\\RevolverPiercer"));
+        result.AddAspect(new SoundAspect("ChargeReady0False", "ChargeReady", "RevolverSounds\\RevolverPiercer"));
+        result.AddAspect(new SoundAspect("ChargingUp0False", "ChargingUp", "RevolverSounds\\RevolverPiercer"));
+        result.AddAspect(new SoundAspect("ClickCancel0False", "ClickCancel", "RevolverSounds\\RevolverPiercer"));
+        result.AddAspect(new SoundAspect("RevolverShootSounds0False", "ShootSounds", "RevolverSounds\\RevolverPiercer"));
+        result.AddAspect(new SoundAspect("RevolverSuperShootSounds0False", "SuperShootSounds", "RevolverSounds\\RevolverPiercer"));
 
-        result.AddAspect(new SoundAspect("ChargeLoop0True", "ChargeLoop", "RevolverSounds\\RevolverPiercerAlt", new string[] { "Charging" }));
-        result.AddAspect(new SoundAspect("ChargeReady0True", "ChargeReady", "RevolverSounds\\RevolverPiercerAlt", new string[] { "BeepBeep_high" }));
-        result.AddAspect(new SoundAspect("ChargingUp0True", "ChargingUp", "RevolverSounds\\RevolverPiercerAlt", new string[] { "Charging" }));
-        result.AddAspect(new SoundAspect("ClickCancel0True", "ClickCancel", "RevolverSounds\\RevolverPiercerAlt", new string[] { "click" }));
-        result.AddAspect(new SoundAspect("RevolverShootSounds0True", "ShootSounds", "RevolverSounds\\RevolverPiercerAlt", new string[] { "AltRevolverShoot2D" }));
-        result.AddAspect(new SoundAspect("RevolverSuperShootSounds0True", "SuperShootSounds", "RevolverSounds\\RevolverPiercerAlt", new string[] { "AltRevolverShoot1D" }));
+        result.AddAspect(new SoundAspect("ChargeLoop0True", "ChargeLoop", "RevolverSounds\\RevolverPiercerAlt"));
+        result.AddAspect(new SoundAspect("ChargeReady0True", "ChargeReady", "RevolverSounds\\RevolverPiercerAlt"));
+        result.AddAspect(new SoundAspect("ChargingUp0True", "ChargingUp", "RevolverSounds\\RevolverPiercerAlt"));
+        result.AddAspect(new SoundAspect("ClickCancel0True", "ClickCancel", "RevolverSounds\\RevolverPiercerAlt"));
+        result.AddAspect(new SoundAspect("RevolverShootSounds0True", "ShootSounds", "RevolverSounds\\RevolverPiercerAlt"));
+        result.AddAspect(new SoundAspect("RevolverSuperShootSounds0True", "SuperShootSounds", "RevolverSounds\\RevolverPiercerAlt"));
+        result.AddAspect(new SoundAspect("HammerClick0", "HammerClick", "RevolverSounds\\RevolverPiercerAlt"));
 
-        result.AddAspect(new SoundAspect("ShotgunShootSounds0", "ShotgunShootSounds", "ShotgunSounds\\ShotgunBlue", new string[] { "Steampunk Weapons - Shotgun 2 - Shot - 03" }));
-        result.AddAspect(new SoundAspect("ShotgunChargeLoop", "ChargeLoop", "ShotgunSounds\\ShotgunBlue", new string[] { "electricCharge" }));
-        result.AddAspect(new SoundAspect("CoreEject", "ShotgunSounds\\ShotgunBlue", true, new string[] { "Steampunk Weapons - Shotgun 2 - Shot - 05" }));
-        result.AddAspect(new SoundAspect("CoreEjectFlick", "ShotgunSounds\\ShotgunBlue", true, new string[] { "Mechanism -  Designed Mega Steam Lever-005b" }));
-        result.AddAspect(new SoundAspect("CoreEjectReload", "ShotgunSounds\\ShotgunBlue", true, new string[] { "Impacts_SIMPLE_003" }));
-        result.AddAspect(new SoundAspect("MainShotReload", "ShotgunSounds\\ShotgunBlue", true, new string[] { "Mechanism -  Designed Mega Steam Lever-0054" }));
-        result.AddAspect(new SoundAspect("HeatHiss", "ShotgunSounds\\ShotgunBlue", true, new string[] { "Mechanism -  Designed Mega Steam Lever-002" }));
+        result.AddAspect(new SoundAspect("ShotgunShootSounds0", "ShotgunShootSounds", "ShotgunSounds\\ShotgunBlue"));
+        result.AddAspect(new SoundAspect("ShotgunChargeLoop", "ChargeLoop", "ShotgunSounds\\ShotgunBlue"));
+        result.AddAspect(new SoundAspect("CoreEject", "ShotgunSounds\\ShotgunBlue", true));
+        result.AddAspect(new SoundAspect("CoreEjectFlick", "ShotgunSounds\\ShotgunBlue", true));
+        result.AddAspect(new SoundAspect("CoreEjectReload", "ShotgunSounds\\ShotgunBlue", true));
+        result.AddAspect(new SoundAspect("MainShotReload", "ShotgunSounds\\ShotgunBlue", true));
+        result.AddAspect(new SoundAspect("HeatHiss", "ShotgunSounds\\ShotgunBlue", true));
 
-        result.AddAspect(new SoundAspect("ShotgunShootSounds1", "ShotgunShootSounds", "ShotgunSounds\\ShotgunGreen", new string[] { "Steampunk Weapons - Shotgun 2 - Shot - 05" }));
-        result.AddAspect(new SoundAspect("ShotgunCharge", "ShotgunSounds\\ShotgunGreen", true, new string[] { "pumpCharge" }));
-        result.AddAspect(new SoundAspect("ShotgunPump1", "ShotgunSounds\\ShotgunGreen", true, new string[] { "shotgunpump1" }));
-        result.AddAspect(new SoundAspect("ShotgunPump2", "ShotgunSounds\\ShotgunGreen", true, new string[] { "shotgunpump2" }));
-        result.AddAspect(new SoundAspect("OverCharged", "ShotgunSounds\\ShotgunGreen", true, new string[] { "CSFX-2_Mechanics_45" }));
+        result.AddAspect(new SoundAspect("ShotgunShootSounds1", "ShotgunShootSounds", "ShotgunSounds\\ShotgunGreen"));
+        result.AddAspect(new SoundAspect("ShotgunCharge", "ShotgunSounds\\ShotgunGreen", true));
+        result.AddAspect(new SoundAspect("ShotgunPump1", "ShotgunSounds\\ShotgunGreen", true));
+        result.AddAspect(new SoundAspect("ShotgunPump2", "ShotgunSounds\\ShotgunGreen", true));
+        result.AddAspect(new SoundAspect("OverCharged", "ShotgunSounds\\ShotgunGreen", true));
 
         allSoundPacks.Add(name, result);
         return result;
@@ -343,24 +345,21 @@ public static class SoundPackController
     {
         public string name;
         public string path;
-        public string[] stockPath;
         public List<AudioClip> allClips = new List<AudioClip>();
 
-        public SoundAspect(string name, string path, bool inRootDirectory, string[] stockPath)
+        public SoundAspect(string name, string path, bool inRootDirectory)
         {
             this.name = name;
             if (inRootDirectory)
                 this.path = "\\" + path + "\\" + name + "\\";
             else
                 this.path = "\\" + path + "\\" + name.Substring(0, name.Length - 1) + "\\";
-            this.stockPath = stockPath;
         }
 
-        public SoundAspect(string name, string folderName, string path, string[] stockPath)
+        public SoundAspect(string name, string folderName, string path)
         {
             this.name = name;
             this.path = "\\" + path + "\\" + folderName + "\\";
-            this.stockPath = stockPath;
         }
     }
 }
@@ -376,9 +375,6 @@ public static class Inject_SoundPackShops
             Transform enemies = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Enemies"), __instance.transform.Find("Canvas").Find("Weapons"));
             enemies.Find("BackButton (2)").gameObject.SetActive(false);
             Transform contentParent = enemies.Find("Panel").Find("Scroll View").Find("Viewport").Find("Content");
-
-            Debug.Log("Children in content is " + contentParent.childCount);
-
             GameObject packTemplate = contentParent.Find("Enemy Button Template").gameObject;
             for (int i = 0; i < contentParent.childCount; i++)
                 contentParent.GetChild(i).gameObject.SetActive(false);
@@ -473,6 +469,16 @@ public static class Inject_RevolverSounds
     }
 }
 
+[HarmonyPatch(typeof(RevolverAnimationReceiver), "Click")]
+public static class Inject_RevolverHammerSound
+{
+    public static bool Prefix(RevolverAnimationReceiver __instance)
+    {
+        SoundPackController.SetAudioSourceClip(__instance.click.GetComponent<AudioSource>(), "HammerClick" + ((Revolver)Traverse.Create(__instance).Field("rev").GetValue()).gunVariation); // I think that traverse is faster than unity's get component in children
+        return true;
+    }
+}
+
 [HarmonyPatch(typeof(Shotgun), "Start")]
 public static class Inject_ShotgunSounds
 {
@@ -542,7 +548,7 @@ public static class Inject_RailcannonShootSounds
         else if (__instance.variation == 2)
         {
             AudioSource[] sources = __instance.fireSound.GetComponents<AudioSource>();
-            SoundPackController.SetAudioSourceClip(sources[0], "RailcannonRedWindDownSounds");
+            SoundPackController.SetAudioSourceClip(sources[0], "RailcannonRedWindDownSounds2");
             SoundPackController.SetAudioSourceClip(sources[1], "RailcannonShootSounds2");
             SoundPackController.SetAudioSourceClip(sources[2], "RailcannonShootSounds2");
         }
