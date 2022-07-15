@@ -96,8 +96,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Patches\Nailgun Patches.cs" />
+    <Compile Include="Patches\Shop Patches.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Patches\Railcannon Patches.cs" />
+    <Compile Include="Patches\Revolver Patches.cs" />
+    <Compile Include="Patches\Shotgun Patches.cs" />
+    <Compile Include="SoundPackController.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
