@@ -11,14 +11,16 @@ using UnityEngine.Networking;
 public static class SoundPackController
 {
     public static string currentSoundPackName = "Stock";
+
     private static Dictionary<string, SoundPack> allSoundPacks = new Dictionary<string, SoundPack>();
     private static SoundPack currentSoundPack = null;
     private static List<string> stockLoadedAspects = new List<string>();
 
-    public static SoundPack CreateNewSoundPack(string name)
+    public static SoundPack CreateNewSoundPack(string name) // The new new sound aspect system is just easier on me for adding and removing sounds, I could hardcode it but I don't really want to
     {
         SoundPack result = new SoundPack(name);
 
+        // Railcannon
         result.AddAspect(new SoundAspect("RailcannonChargedSounds", "RailcannonSounds", true));
 
         result.AddAspect(new SoundAspect("RailcannonClickSounds0", "RailcannonSounds\\RailcannonBlue", false));
@@ -37,6 +39,7 @@ public static class SoundPackController
         result.AddAspect(new SoundAspect("RailcannonRedWindDownSounds2", "RailcannonSounds\\RailcannonRed", false));
         result.AddAspect(new SoundAspect("RailcannonWhirSounds2", "RailcannonSounds\\RailcannonRed", false));
 
+        // Revolver
         result.AddAspect(new SoundAspect("CoinBreak1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman"));
         result.AddAspect(new SoundAspect("CoinFlashLoop1False", "CoinFlashLoop", "RevolverSounds\\RevolverMarksman"));
         result.AddAspect(new SoundAspect("CoinFlip1False", "CoinFlip", "RevolverSounds\\RevolverMarksman"));
@@ -56,6 +59,7 @@ public static class SoundPackController
         result.AddAspect(new SoundAspect("RevolverShootSounds1True", "ShootSounds", "RevolverSounds\\RevolverMarksmanAlt"));
         result.AddAspect(new SoundAspect("HammerClick1", "HammerClick", "RevolverSounds\\RevolverMarksmanAlt"));
 
+        // Shotgun
         result.AddAspect(new SoundAspect("ChargeLoop0False", "ChargeLoop", "RevolverSounds\\RevolverPiercer"));
         result.AddAspect(new SoundAspect("ChargeReady0False", "ChargeReady", "RevolverSounds\\RevolverPiercer"));
         result.AddAspect(new SoundAspect("ChargingUp0False", "ChargingUp", "RevolverSounds\\RevolverPiercer"));
@@ -85,8 +89,51 @@ public static class SoundPackController
         result.AddAspect(new SoundAspect("ShotgunPump2", "ShotgunSounds\\ShotgunGreen", true));
         result.AddAspect(new SoundAspect("OverCharged", "ShotgunSounds\\ShotgunGreen", true));
 
+        // Nailgun
+        result.AddAspect(new SoundAspect("BarrelSpin1False", "BarrelSpin", "NailgunSounds\\NailgunBlue"));
+        result.AddAspect(new SoundAspect("NailgunLastShot1False", "NailgunLastShot", "NailgunSounds\\NailgunBlue"));
+        result.AddAspect(new SoundAspect("NailgunShot1False", "NailgunShot", "NailgunSounds\\NailgunBlue"));
+        result.AddAspect(new SoundAspect("NewCharge1False", "NewCharge", "NailgunSounds\\NailgunBlue"));
+        result.AddAspect(new SoundAspect("NoAmmoClick1False", "NoAmmoClick", "NailgunSounds\\NailgunBlue"));
 
-        result.AddAspect(new SoundAspect("NailgunShoot", "NailgunSounds", true));
+        result.AddAspect(new SoundAspect("MagnetBeep1False", "MagnetBeep", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("MagnetBreak1False", "MagnetBreak", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("MagnetHit1False", "MagnetHit", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("MagnetHitEnemy1False", "MagnetHitEnemy", "NailgunSounds\\NailgunBlueAlt"));
+
+        result.AddAspect(new SoundAspect("MagnetBeep1True", "MagnetBeep", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("MagnetBreak1True", "MagnetBreak", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("MagnetHit1True", "MagnetHit", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("MagnetHitEnemy1True", "MagnetHitEnemy", "NailgunSounds\\NailgunBlueAlt"));
+
+        result.AddAspect(new SoundAspect("BarrelSpin0False", "BarrelSpin", "NailgunSounds\\NailgunGreen"));
+        result.AddAspect(new SoundAspect("NailgunShot0False", "NailgunShot", "NailgunSounds\\NailgunGreen"));
+        result.AddAspect(new SoundAspect("NewCharge0False", "NewCharge", "NailgunSounds\\NailgunGreen"));
+
+        result.AddAspect(new SoundAspect("BarrelSpin1True", "BarrelSpin", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("NailgunLastShot1True", "NailgunLastShot", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("NailgunShot1True", "NailgunShot", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("NailgunSnap1True", "NailgunSnap", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("NewCharge1True", "NewCharge", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("NoAmmoClick1True", "NoAmmoClick", "NailgunSounds\\NailgunBlueAlt"));
+
+        result.AddAspect(new SoundAspect("BarrelSpin0True", "BarrelSpin", "NailgunSounds\\NailgunGreenAlt"));
+        result.AddAspect(new SoundAspect("NailgunShot0True", "NailgunShot", "NailgunSounds\\NailgunGreenAlt"));
+        result.AddAspect(new SoundAspect("NailgunSnap0True", "NailgunSnap", "NailgunSounds\\NailgunGreenAlt"));
+        result.AddAspect(new SoundAspect("NewCharge0True", "NewCharge", "NailgunSounds\\NailgunGreenAlt"));
+
+        result.AddAspect(new SoundAspect("NailgunShotOverheat0False", "NailgunShotOverheat", "NailgunSounds\\NailgunGreen"));
+        result.AddAspect(new SoundAspect("NailgunShotOverheat0True", "NailgunShotOverheat", "NailgunSounds\\NailgunGreenAlt"));
+
+        result.AddAspect(new SoundAspect("HeatSteam1False", "HeatSteam", "NailgunSounds\\NailgunBlue"));
+        result.AddAspect(new SoundAspect("HeatSteam0False", "HeatSteam", "NailgunSounds\\NailgunGreen"));
+        result.AddAspect(new SoundAspect("NailZap1False", "NailZap", "NailgunSounds\\NailgunBlue"));
+        result.AddAspect(new SoundAspect("NailZap0False", "NailZap", "NailgunSounds\\NailgunGreen"));
+
+        result.AddAspect(new SoundAspect("SawBreak1True", "SawBreak", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("SawBreak0True", "SawBreak", "NailgunSounds\\NailgunGreenAlt"));
+        result.AddAspect(new SoundAspect("SawBounce1True", "SawBounce", "NailgunSounds\\NailgunBlueAlt"));
+        result.AddAspect(new SoundAspect("SawBounce0True", "SawBounce", "NailgunSounds\\NailgunGreenAlt"));
 
         allSoundPacks.Add(name, result);
         return result;
@@ -105,19 +152,15 @@ public static class SoundPackController
             currentSoundPackName = name;
         }
         else
-            Plugin.Log("Tried to set current soundpack to " + name + " but it wasn't found!");
+            Debug.Log("Tried to set current soundpack to " + name + " but it wasn't found!");
         foreach (Revolver r in Resources.FindObjectsOfTypeAll<Revolver>())
-        {
             Inject_RevolverSounds.Postfix(r);
-        }
         foreach (Railcannon r in Resources.FindObjectsOfTypeAll<Railcannon>())
-        {
             Inject_RailcannonSounds.Postfix(r);
-        }
         foreach (Shotgun s in Resources.FindObjectsOfTypeAll<Shotgun>())
-        {
             Inject_ShotgunSounds.Postfix(s);
-        }
+        foreach (Nailgun n in Resources.FindObjectsOfTypeAll<Nailgun>())
+            Inject_NailgunSounds.Postfix(n);
     }
 
     public static void GetAllAudioClips(string name, ref AudioClip[] clips)
@@ -140,7 +183,7 @@ public static class SoundPackController
     {
         if (source == null)
         {
-            Plugin.Log("Got a null audiosource while handling " + name);
+            Debug.Log("Got a null audiosource while handling " + name);
             return;
         }
         if (name != "Random" && !stockLoadedAspects.Contains(name) && source.clip != null)
@@ -158,7 +201,7 @@ public static class SoundPackController
 
     public static void SetAudioClip(ref AudioClip clip, string name)
     {
-        if (!stockLoadedAspects.Contains(name))
+        if (!stockLoadedAspects.Contains(name) && clip != null)
         {
             stockLoadedAspects.Add(name);
             allSoundPacks["Stock"].GetAspect(name).allClips.Add(clip);
@@ -167,9 +210,7 @@ public static class SoundPackController
         {
             AudioClip newClip = currentSoundPack.GetRandomClipFromAspect(name);
             if (newClip != null)
-            {
                 clip = newClip;
-            }
         }
     }
 
@@ -195,6 +236,7 @@ public static class SoundPackController
                 foreach (FileInfo file in new DirectoryInfo(info.FullName + aspect.path).GetFiles("*.ogg", SearchOption.AllDirectories))
                     caller.StartCoroutine(StartNewWWW(aspect, file.FullName, AudioType.OGGVORBIS));
             }
+
             if (File.Exists(info.FullName + "\\preview.png"))
             {
                 using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(info.FullName + "\\preview.png"))
@@ -202,8 +244,8 @@ public static class SoundPackController
                     yield return www.SendWebRequest();
                     if (www.isNetworkError)
                     {
-                        Plugin.Log("couldn't load preview image " + info.FullName + "\\preview.png");
-                        Plugin.Log(www.error);
+                        Debug.Log("couldn't load preview image " + info.FullName + "\\preview.png");
+                        Debug.Log(www.error);
                     }
                     else
                     {
@@ -222,8 +264,8 @@ public static class SoundPackController
 
                 if (www.isNetworkError)
                 {
-                    Plugin.Log("couldn't load clip " + soundUrl);
-                    Plugin.Log(www.error);
+                    Debug.Log("couldn't load clip " + soundUrl);
+                    Debug.Log(www.error);
                 }
                 else
                 {
@@ -231,6 +273,7 @@ public static class SoundPackController
                 }
             }
         }
+
         public void AddAspect(SoundAspect toAdd)
         {
             allAspects.Add(toAdd.name, toAdd);
@@ -240,15 +283,20 @@ public static class SoundPackController
         {
             if (name == "Random")
             {
-                SoundAspect randomAspect = allAspects.Values.ToList()[UnityEngine.Random.Range(0, allAspects.Values.Count - 1)];
+                SoundAspect randomAspect = allAspects.Values.ToList()[Random.Range(0, allAspects.Values.Count - 1)];
                 while (randomAspect.allClips.Count <= 0)
-                    randomAspect = allAspects.Values.ToList()[UnityEngine.Random.Range(0, allAspects.Values.Count - 1)];
+                    randomAspect = allAspects.Values.ToList()[Random.Range(0, allAspects.Values.Count - 1)];
                 if (randomAspect.allClips.Count == 1)
                     return randomAspect.allClips[0];
-                return randomAspect.allClips[UnityEngine.Random.Range(0, randomAspect.allClips.Count - 1)];
+                return randomAspect.allClips[Random.Range(0, randomAspect.allClips.Count - 1)];
             }
             if (!allAspects.ContainsKey(name) || allAspects[name].allClips.Count <= 0)
                 return null;
+            if (!allAspects.ContainsKey(name))
+            {
+                Debug.LogError("Could not get aspect " + name);
+                return null;
+            }
             List<AudioClip> allClips = allAspects[name].allClips;
             if (allClips.Count == 1)
                 return allClips[0];

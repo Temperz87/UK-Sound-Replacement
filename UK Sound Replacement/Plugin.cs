@@ -58,8 +58,6 @@ public class Plugin : BaseUnityPlugin
         }
     }
 
-    public static void Log(string message) => Debug.Log(message);
-
     public void OnApplicationQuit()
     {
         using (StreamReader jFile = saveFileInfo.OpenText())
