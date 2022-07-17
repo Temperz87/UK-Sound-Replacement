@@ -179,7 +179,7 @@ public static class SoundPackController
         }
     }
 
-    public static void SetAudioSourceClip(AudioSource source, string name)
+    public static void SetAudioSourceClip(AudioSource source, string name, bool playSource = false)
     {
         if (source == null)
         {
@@ -195,7 +195,11 @@ public static class SoundPackController
         {
             AudioClip clip = currentSoundPack.GetRandomClipFromAspect(name);
             if (clip != null)
+            {
                 source.clip = clip;
+                if (playSource)
+                    source.Play();
+            }
         }
     }
 

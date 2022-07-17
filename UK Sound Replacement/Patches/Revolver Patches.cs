@@ -16,10 +16,10 @@ public static class Inject_RevolverSounds
             {
                 foreach (AudioSource source in __instance.GetComponentsInChildren<AudioSource>(true))
                     if (source.name == "ChargeEffect")
-                        SoundPackController.SetAudioSourceClip(source, "ChargeLoop" + __instance.gunVariation + __instance.altVersion.ToString());
+                        SoundPackController.SetAudioSourceClip(source, "ChargeLoop" + __instance.gunVariation + __instance.altVersion.ToString(), true);
             }
             else
-                SoundPackController.SetAudioSourceClip(__instance.gunBarrel.transform.GetChild(0).GetComponent<AudioSource>(), "ChargeLoop" + __instance.gunVariation + __instance.altVersion.ToString());
+                SoundPackController.SetAudioSourceClip(__instance.gunBarrel.transform.GetChild(0).GetComponent<AudioSource>(), "ChargeLoop" + __instance.gunVariation + __instance.altVersion.ToString(), true);
             foreach (AudioSource source in __instance.GetComponentsInChildren<AudioSource>(true))
                 if (source.name == "Bone_001")
                     SoundPackController.SetAudioSourceClip(source, "ClickCancel" + __instance.gunVariation + __instance.altVersion.ToString());

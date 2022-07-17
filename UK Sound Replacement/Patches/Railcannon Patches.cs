@@ -27,7 +27,7 @@ public static class Inject_RailcannonSounds
         AudioSource fullAud = (AudioSource)Traverse.Create(__instance).Field("fullAud").GetValue();
         if (fullAud == null)
             fullAud = __instance.fullCharge.GetComponent<AudioSource>();
-        SoundPackController.SetAudioSourceClip(fullAud, "RailcannonIdleSounds" + __instance.variation);
+        SoundPackController.SetAudioSourceClip(fullAud, "RailcannonIdleSounds" + __instance.variation, true);
     }
 }
 
@@ -39,7 +39,7 @@ public static class Inject_RailcannonIdleSounds
         foreach (AudioSource source in __instance.GetComponents<AudioSource>())
         {
             if (source.loop)
-                SoundPackController.SetAudioSourceClip(source, "RailcannonWhirSounds" + ((Railcannon)Traverse.Create(__instance).Field("rc").GetValue()).variation);
+                SoundPackController.SetAudioSourceClip(source, "RailcannonWhirSounds" + ((Railcannon)Traverse.Create(__instance).Field("rc").GetValue()).variation, false);
             else
                 SoundPackController.SetAudioSourceClip(source, "RailcannonClickSounds" + ((Railcannon)Traverse.Create(__instance).Field("rc").GetValue()).variation);
         }

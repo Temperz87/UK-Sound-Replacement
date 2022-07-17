@@ -6,7 +6,7 @@ public static class Inject_NailgunSounds
 {
     public static void Postfix(Nailgun __instance)
     {
-        SoundPackController.SetAudioSourceClip(Traverse.Create(__instance).Field("barrelAud").GetValue() as AudioSource, "BarrelSpin" + __instance.variation + __instance.altVersion);
+        SoundPackController.SetAudioSourceClip(Traverse.Create(__instance).Field("barrelAud").GetValue() as AudioSource, "BarrelSpin" + __instance.variation + __instance.altVersion, true);
         SoundPackController.SetAudioSourceClip(Traverse.Create(__instance).Field("aud").GetValue() as AudioSource, "NewCharge" + __instance.variation + __instance.altVersion);
         if (__instance.variation == 1)
         {
@@ -72,16 +72,6 @@ public static class Inject_NailgunSnapSounds
     public static bool Prefix(Nailgun __instance)
     {
         SoundPackController.SetAudioSourceClip(__instance.snapSound, "NailgunSnap" + __instance.variation + __instance.altVersion);
-        return true;
-    }
-}
-
-[HarmonyPatch(typeof(Nailgun), "ShootMagnet")]
-public static class Inject_NailgunMagnetSounds
-{
-    public static bool Prefix(Nailgun __instance)
-    {
-        SoundPackController.SetAudioSourceClip(Traverse.Create(__instance).Field("barrelAud").GetValue() as AudioSource, "BarrelSpin" + __instance.variation + __instance.altVersion);
         return true;
     }
 }
