@@ -45,11 +45,15 @@ public class Plugin : BaseUnityPlugin
                 using (StreamReader jFile = saveFileInfo.OpenText())
                 {
                     Dictionary<string, string> jValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(jFile.ReadToEnd());
-                    string name = "No Name";
-                    if (jValues.ContainsKey("name"))
-                        name = jValues["name"];
+                    jValues.TryGetValue("rev", out string rev);
+                    jValues.TryGetValue("sg", out string sg);
+                    jValues.TryGetValue("ng", out string ng);
+                    jValues.TryGetValue("rc", out string rc);
                     Debug.Log("Found a .uksf save file, setting sound pack to " + name);
-                    SoundPackController.SetCurrentSoundPack(name);
+                    SoundPackController.SetCurrentSoundPack(rev, SoundPackController.SoundPackType.Revolver);
+                    SoundPackController.SetCurrentSoundPack(sg, SoundPackController.SoundPackType.Shotgun);
+                    SoundPackController.SetCurrentSoundPack(ng, SoundPackController.SoundPackType.Nailgun);
+                    SoundPackController.SetCurrentSoundPack(rc, SoundPackController.SoundPackType.Railcannon);
                     jFile.Close();
                 }
             }
@@ -63,8 +67,14 @@ public class Plugin : BaseUnityPlugin
         using (StreamReader jFile = saveFileInfo.OpenText())
         {
             Dictionary<string, string> jValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(jFile.ReadToEnd());
-            if (jValues.ContainsKey("name"))
-                jValues["name"] = SoundPackController.currentSoundPackName;
+            if (jValues.ContainsKey("rev"))
+                jValues["rev"] = SoundPackController.revolverSoundPack.name;
+            if (jValues.ContainsKey("sg"))
+                jValues["sg"] = SoundPackController.shotgunSoundPack.name;
+            if (jValues.ContainsKey("ng"))
+                jValues["ng"] = SoundPackController.nailgunSoundPack.name;
+            if (jValues.ContainsKey("rc"))
+                jValues["rc"] = SoundPackController.railcannonSoundPack.name;
             jFile.Close();
             File.WriteAllText(saveFileInfo.FullName, JsonConvert.SerializeObject(jValues));
         }

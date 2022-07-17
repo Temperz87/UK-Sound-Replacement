@@ -10,10 +10,17 @@ using UnityEngine.Networking;
 
 public static class SoundPackController
 {
-    public static string currentSoundPackName = "Stock";
+    //public static string currentSoundPackName = "Stock";
 
     private static Dictionary<string, SoundPack> allSoundPacks = new Dictionary<string, SoundPack>();
-    private static SoundPack currentSoundPack = null;
+
+    //private static SoundPack currentSoundPack = null;
+
+    public static SoundPack revolverSoundPack = null;
+    public static SoundPack shotgunSoundPack = null;
+    public static SoundPack nailgunSoundPack = null;
+    public static SoundPack railcannonSoundPack = null;
+
     private static List<string> stockLoadedAspects = new List<string>();
 
     public static SoundPack CreateNewSoundPack(string name) // The new new sound aspect system is just easier on me for adding and removing sounds, I could hardcode it but I don't really want to
@@ -144,15 +151,43 @@ public static class SoundPackController
         return (SoundPack[])allSoundPacks.Values.ToArray().Clone();
     }
 
-    public static void SetCurrentSoundPack(string name)
+    public static void SetCurrentSoundPack(string name, SoundPackType type)
     {
+        if (name == "")
+            name = "Stock";
         if (allSoundPacks.ContainsKey(name))
         {
-            currentSoundPack = allSoundPacks[name];
-            currentSoundPackName = name;
+            SoundPack toSet = allSoundPacks[name];
+            //currentSoundPack = allSoundPacks[name];
+            //currentSoundPackName = name;
+            switch (type)
+            {
+                case SoundPackType.Revolver:
+                    revolverSoundPack = toSet;
+                    break;
+                case SoundPackType.Shotgun:
+                    shotgunSoundPack = toSet;
+                    break;
+                case SoundPackType.Nailgun:
+                    nailgunSoundPack = toSet;
+                    break;
+                case SoundPackType.Railcannon:
+                    railcannonSoundPack = toSet;
+                    break;
+                case SoundPackType.All:
+                    revolverSoundPack = toSet;
+                    shotgunSoundPack = toSet;
+                    nailgunSoundPack = toSet;
+                    railcannonSoundPack = toSet;
+                    break;
+            }
         }
         else
+        {
             Debug.Log("Tried to set current soundpack to " + name + " but it wasn't found!");
+            SetCurrentSoundPack("Stock", type);
+            return;
+        }
         foreach (Revolver r in Resources.FindObjectsOfTypeAll<Revolver>())
             Inject_RevolverSounds.Postfix(r);
         foreach (Railcannon r in Resources.FindObjectsOfTypeAll<Railcannon>())
@@ -163,7 +198,23 @@ public static class SoundPackController
             Inject_NailgunSounds.Postfix(n);
     }
 
-    public static void GetAllAudioClips(string name, ref AudioClip[] clips)
+    public static SoundPack RetrieveSoundPackByType(SoundPackType type)
+    {
+        switch (type)
+        {
+            case SoundPackType.Revolver:
+                return revolverSoundPack;
+            case SoundPackType.Shotgun:
+                return shotgunSoundPack;
+            case SoundPackType.Nailgun:
+                return nailgunSoundPack;
+            case SoundPackType.Railcannon:
+                return railcannonSoundPack;
+        }
+        return null;
+    }
+
+    public static void GetAllAudioClips(ref AudioClip[] clips, string name, SoundPackType type)
     {
         if (!stockLoadedAspects.Contains(name))
         {
@@ -171,15 +222,16 @@ public static class SoundPackController
             foreach (AudioClip clip in clips)
                 allSoundPacks["Stock"].GetAspect(name).allClips.Add(clip);
         }
-        if (currentSoundPack != null)
+        SoundPack pack = RetrieveSoundPackByType(type);
+        if (pack != null)
         {
-            AudioClip[] allClips = currentSoundPack.GetAllAudioClipsOfAspect(name);
+            AudioClip[] allClips = pack.GetAllAudioClipsOfAspect(name);
             if (allClips != null)
                 clips = allClips;
         }
     }
 
-    public static void SetAudioSourceClip(AudioSource source, string name, bool playSource = false)
+    public static void SetAudioSourceClip(AudioSource source, string name, SoundPackType type, bool playSource = false)
     {
         if (source == null)
         {
@@ -191,9 +243,10 @@ public static class SoundPackController
             stockLoadedAspects.Add(name);
             allSoundPacks["Stock"].GetAspect(name).allClips.Add(source.clip);
         }
-        if (currentSoundPack != null)
+        SoundPack pack = RetrieveSoundPackByType(type);
+        if (pack != null)
         {
-            AudioClip clip = currentSoundPack.GetRandomClipFromAspect(name);
+            AudioClip clip = pack.GetRandomClipFromAspect(name);
             if (clip != null)
             {
                 source.clip = clip;
@@ -203,16 +256,17 @@ public static class SoundPackController
         }
     }
 
-    public static void SetAudioClip(ref AudioClip clip, string name)
+    public static void SetAudioClip(ref AudioClip clip, string name, SoundPackType type)
     {
         if (!stockLoadedAspects.Contains(name) && clip != null)
         {
             stockLoadedAspects.Add(name);
             allSoundPacks["Stock"].GetAspect(name).allClips.Add(clip);
         }
-        if (currentSoundPack != null)
+        SoundPack pack = RetrieveSoundPackByType(type);
+        if (pack != null)
         {
-            AudioClip newClip = currentSoundPack.GetRandomClipFromAspect(name);
+            AudioClip newClip = pack.GetRandomClipFromAspect(name);
             if (newClip != null)
                 clip = newClip;
         }
@@ -342,5 +396,14 @@ public static class SoundPackController
             this.name = name;
             this.path = "\\" + path + "\\" + folderName + "\\";
         }
+    }
+
+    public enum SoundPackType
+    {
+        Revolver,
+        Shotgun,
+        Nailgun,
+        Railcannon,
+        All
     }
 }
