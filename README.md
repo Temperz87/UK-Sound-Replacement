@@ -1,5 +1,5 @@
 # UK Sound Replacement
-A mod that allows you to make and use soundpacks to replace the sounds in Ultrakill. The mod does not come with any sound packs, so make sure to download those yourself.
+A mod that allows you to make and use soundpacks to replace the sounds in Ultrakill. The mod does not come with any sound packs, so make sure to download those yourself. An installation guide can be found [here](https://www.youtube.com/watch?v=meNiXcbPh_s).
 
 [A soundpack by BVSSIC can by downloaded here](https://mega.nz/folder/Zc5SULaR#qkbbVPobyxkiPKwPOgkZkg)
 ----------
