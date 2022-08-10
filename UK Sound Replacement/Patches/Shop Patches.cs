@@ -19,14 +19,14 @@ public static class Inject_SoundPackShops
             editingText.transform.parent = enemies.parent;
             editingText.gameObject.SetActive(false);
             Transform contentParent = enemies.Find("Panel").Find("Scroll View").Find("Viewport").Find("Content");
-            
+
             // Making the button that opens the sound packs page
             Transform newArmsButton = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Weapons").Find("ArmButton").gameObject, __instance.transform.Find("Canvas").Find("Weapons")).transform;
             newArmsButton.localPosition = new Vector3(-180f, -144.7f, -45.00326f);
             newArmsButton.gameObject.GetComponentInChildren<Text>(true).text = "SOUND PACKS";
             ShopButton button = newArmsButton.GetComponent<ShopButton>();
-            button.toActivate = new GameObject[] 
-            { 
+            button.toActivate = new GameObject[]
+            {
                 enemies.gameObject,
                 contentParent.gameObject,
                 editingText.gameObject
@@ -93,7 +93,7 @@ public static class Inject_SoundPackShops
             newRev.GetComponent<ShopButton>().toActivate = new GameObject[] { };
             newRev.GetComponent<ShopButton>().toDeactivate = new GameObject[] { };
             Image revImage = newRev.GetChild(0).GetComponent<Image>();
-            newRev.GetComponent<Button>().onClick.AddListener(delegate 
+            newRev.GetComponent<Button>().onClick.AddListener(delegate
             {
                 SoundPackController.SetCurrentSoundPack(selectedPack.name, SoundPackController.SoundPackType.Revolver);
 
@@ -216,7 +216,7 @@ public static class Inject_SoundPackShops
                     {
                         while (b < 255)
                         {
-                           b = (int)Mathf.Min(b + (Time.deltaTime * multiplier), 255);
+                            b = (int)Mathf.Min(b + (Time.deltaTime * multiplier), 255);
                             foreach (Image image in toSet)
                                 image.color = new Color32((byte)r, (byte)g, (byte)b, 255);
                             yield return null;
@@ -256,7 +256,7 @@ public static class Inject_SoundPackShops
             for (int i = 0; i < contentParent.childCount; i++)
                 contentParent.GetChild(i).gameObject.SetActive(false);
             packTemplate.gameObject.SetActive(true);
-            
+
             // Actually injecting the sound packs
             foreach (SoundPackController.SoundPack pack in SoundPackController.GetAllSoundPacks())
             {
@@ -308,7 +308,7 @@ public static class Inject_SoundPackShops
                         rcImage.color = new Color32(255, 255, 255, 255);
                     contentParent.gameObject.SetActive(false);
                 });
-                
+
                 GameObject newText = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Weapons").Find("ArmButton").gameObject, newPack.transform.GetChild(0).GetChild(0)); // yes I tried making a "prefab" out of this and instantiating it, didn't work
                 GameObject.Destroy(newText.GetComponent<ShopButton>());
                 newText.transform.localPosition = Vector3.zero;
@@ -319,6 +319,140 @@ public static class Inject_SoundPackShops
                 text.raycastTarget = false;
             }
             packTemplate.SetActive(false);
+        }
+    }
+}
+
+[HarmonyPatch(typeof(WaveMenu), "Start")]
+public static class Inject_CgMusicSelector
+{
+    public static void Prefix(ScreenZone __instance) 
+    {
+        if (__instance.transform.Find("Canvas").Find("Waves") != null)
+        {
+
+            GameObject newPage = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Patterns").gameObject, __instance.transform.Find("Canvas"));
+            newPage.SetActive(false);
+            newPage.transform.Find("Panel").Find("StateButton").gameObject.SetActive(false);
+
+            Transform title = newPage.transform.Find("Panel").Find("Title");
+            title.gameObject.SetActive(true);
+            title.GetComponent<Text>().text = "--MUSIC--";
+            title.transform.localPosition += new Vector3(60f, 0f, 0f);
+
+            Transform customStuff = newPage.transform.Find("Panel").Find("CustomStuff");
+            customStuff.transform.Find("PreviousButton").gameObject.SetActive(false);
+            customStuff.transform.Find("NextButton").gameObject.SetActive(false);
+            customStuff.transform.Find("RefreshButton").gameObject.SetActive(false);
+            customStuff.transform.Find("EditorButton").gameObject.SetActive(false);
+            customStuff.gameObject.SetActive(true);
+
+            Transform gridParent = customStuff.Find("Grid");
+            foreach (Transform tf in gridParent)
+                tf.gameObject.SetActive(false);
+            Transform introParent = GameObject.Instantiate(gridParent.gameObject, gridParent.transform.parent).transform;
+
+            GameObject exampleButton = gridParent.Find("CustomButton").gameObject;
+            exampleButton.SetActive(true);
+            GameObject text = customStuff.Find("PageText").gameObject;
+            text.SetActive(true);
+            foreach (SoundPackController.ClipData clip in SoundPackController.cgMusic)
+            {
+                GameObject musicButton = GameObject.Instantiate(exampleButton, exampleButton.transform.parent);
+                Button button = musicButton.GetComponent<Button>();
+                button.onClick.AddListener(delegate
+                {
+                    SoundPackController.selectedCgMusic = clip;
+                    Plugin.instance.SetPersistentModData("cgLoop", clip.title);
+                });
+                button.targetGraphic.color = new Color32(125, 125, 125, 255);
+                GameObject newText = GameObject.Instantiate(text, musicButton.transform);
+                newText.transform.localPosition = new Vector3(40f, 10f, 0f);
+                newText.transform.localEulerAngles = new Vector3(0f, 0f, 180f);
+                newText.transform.localScale = new Vector3(-1f, 1f, 1f);
+                Text titleText = newText.GetComponent<Text>();
+                titleText.resizeTextForBestFit = true;
+                titleText.text = clip.title;
+            }
+            exampleButton.SetActive(false);
+            text.SetActive(false);
+
+            exampleButton = introParent.Find("CustomButton").gameObject;
+            exampleButton.SetActive(true);
+            text = customStuff.Find("PageText").gameObject;
+            text.SetActive(true);
+            foreach (SoundPackController.ClipData clip in SoundPackController.cgMusicIntro)
+            {
+                GameObject musicButton = GameObject.Instantiate(exampleButton, exampleButton.transform.parent);
+                Button button = musicButton.GetComponent<Button>();
+                button.onClick.AddListener(delegate
+                {
+                    SoundPackController.selectedCgMusicIntro = clip;
+                    Plugin.instance.SetPersistentModData("cgIntro", clip.title);
+                });
+                button.targetGraphic.color = new Color32(125, 125, 125, 255);
+                GameObject newText = GameObject.Instantiate(text, musicButton.transform);
+                newText.transform.localPosition = new Vector3(40f, 10f, 0f);
+                newText.transform.localEulerAngles = new Vector3(0f, 0f, 180f);
+                newText.transform.localScale = new Vector3(-1f, 1f, 1f);
+                Text titleText = newText.GetComponent<Text>();
+                titleText.resizeTextForBestFit = true;
+                titleText.text = clip.title;
+            }
+            exampleButton.SetActive(false);
+            text.SetActive(false);
+
+            introParent.gameObject.SetActive(false);
+            introParent.gameObject.AddComponent<HudOpenEffect>();
+            gridParent.gameObject.SetActive(false);
+            gridParent.gameObject.AddComponent<HudOpenEffect>();
+
+            GameObject buttonTemplate = __instance.transform.Find("Canvas").Find("Waves").Find("Panel").Find("0").gameObject;
+            buttonTemplate.SetActive(false);
+
+            GameObject loopSubpageButton = GameObject.Instantiate(buttonTemplate, title);
+            loopSubpageButton.transform.localPosition = new Vector3(0f, -30, 0);
+            WaveSetter loopSetter = loopSubpageButton.GetComponent<WaveSetter>();
+            ShopButton newLoopButton = loopSubpageButton.AddComponent<ShopButton>();
+            newLoopButton.clickSound = Traverse.Create(loopSetter).Field("buttonSuccess").GetValue() as GameObject;
+            GameObject.Destroy(loopSetter);
+            newLoopButton.toActivate = new GameObject[] { gridParent.gameObject };
+            newLoopButton.toDeactivate = new GameObject[] { introParent.gameObject };
+            loopSubpageButton.GetComponentInChildren<Text>().text = "Loops";
+            loopSubpageButton.SetActive(true);
+
+            GameObject introSubpageButton = GameObject.Instantiate(buttonTemplate, title);
+            introSubpageButton.transform.localPosition = new Vector3(230f, -30, 0);
+            WaveSetter introSetter = introSubpageButton.GetComponent<WaveSetter>();
+            ShopButton newIntroButton = introSubpageButton.AddComponent<ShopButton>();
+            newIntroButton.clickSound = Traverse.Create(introSetter).Field("buttonSuccess").GetValue() as GameObject;
+            GameObject.Destroy(introSetter);
+            newIntroButton.toActivate = new GameObject[] { introParent.gameObject };
+            newIntroButton.toDeactivate = new GameObject[] { gridParent.gameObject };
+            introSubpageButton.GetComponentInChildren<Text>().text = "Intros";
+            introSubpageButton.SetActive(true);
+
+            buttonTemplate.SetActive(true);
+
+            GameObject newButton = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Main Menu").Find("WavesButton").gameObject, __instance.transform.Find("Canvas").Find("Main Menu"));
+            newButton.transform.localPosition -= new Vector3(0f, 60f, 0f);
+            newButton.GetComponentInChildren<Text>().text = "MUSIC";    
+            ShopButton musicShopButton = newButton.GetComponent<ShopButton>();
+            musicShopButton.toDeactivate = musicShopButton.toDeactivate.AddToArray(musicShopButton.toActivate[0]);
+            musicShopButton.toActivate = new GameObject[] { newPage.gameObject };
+
+            ShopButton themeButton = __instance.transform.Find("Canvas").Find("Main Menu").Find("ThemeButton").GetComponent<ShopButton>();
+            themeButton.toDeactivate = themeButton.toDeactivate.AddToArray(newPage.gameObject);
+            themeButton.toDeactivate = themeButton.toDeactivate.AddToArray(gridParent.gameObject);
+            themeButton.toDeactivate = themeButton.toDeactivate.AddToArray(introParent.gameObject);
+            ShopButton patternButton = __instance.transform.Find("Canvas").Find("Main Menu").Find("PatternsButton").GetComponent<ShopButton>();
+            patternButton.toDeactivate = patternButton.toDeactivate.AddToArray(newPage.gameObject);
+            patternButton.toDeactivate = patternButton.toDeactivate.AddToArray(gridParent.gameObject);
+            patternButton.toDeactivate = patternButton.toDeactivate.AddToArray(introParent.gameObject);
+            ShopButton wavesButton = __instance.transform.Find("Canvas").Find("Main Menu").Find("WavesButton").GetComponent<ShopButton>();
+            wavesButton.toDeactivate = wavesButton.toDeactivate.AddToArray(newPage.gameObject);
+            wavesButton.toDeactivate = wavesButton.toDeactivate.AddToArray(gridParent.gameObject);
+            wavesButton.toDeactivate = wavesButton.toDeactivate.AddToArray(introParent.gameObject);
         }
     }
 }

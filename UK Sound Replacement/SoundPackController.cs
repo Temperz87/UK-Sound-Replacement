@@ -1,7 +1,4 @@
-﻿using BepInEx;
-using HarmonyLib;
-using Newtonsoft.Json;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,11 +7,13 @@ using UnityEngine.Networking;
 
 public static class SoundPackController
 {
-    //public static string currentSoundPackName = "Stock";
-
+    public static ClipData selectedCgMusic = null;
+    public static string persistentLoopName = "";
+    public static ClipData selectedCgMusicIntro = null;
+    public static string persistentIntroName = "";
+    public static List<ClipData> cgMusic { get; private set; } = new List<ClipData>();
+    public static List<ClipData> cgMusicIntro { get; private set; } = new List<ClipData>();
     private static Dictionary<string, SoundPack> allSoundPacks = new Dictionary<string, SoundPack>();
-
-    //private static SoundPack currentSoundPack = null;
 
     public static SoundPack revolverSoundPack = null;
     public static SoundPack shotgunSoundPack = null;
@@ -23,7 +22,7 @@ public static class SoundPackController
 
     private static List<string> stockLoadedAspects = new List<string>();
 
-    public static SoundPack CreateNewSoundPack(string name) // The new new sound aspect system is just easier on me for adding and removing sounds, I could hardcode it but I don't really want to
+    public static SoundPack CreateNewSoundPack(string name) // The new sound aspect system is just easier on me for adding and removing sounds, I could hardcode it but I don't really want to
     {
         SoundPack result = new SoundPack(name);
 
@@ -151,7 +150,90 @@ public static class SoundPackController
         return (SoundPack[])allSoundPacks.Values.ToArray().Clone();
     }
 
-    public static void SetCurrentSoundPack(string name, SoundPackType type)
+    public static IEnumerator LoadCgMusic(string path, MonoBehaviour caller)
+    {
+        DirectoryInfo info = new DirectoryInfo(path + "/CyberGrindMusic");
+        if (!info.Exists)
+        {
+            Directory.CreateDirectory(info.FullName);
+            yield break;
+        }
+        info = new DirectoryInfo(path + "/CyberGrindMusic/Loops");
+        foreach (FileInfo file in info.GetFiles("*.wav", SearchOption.AllDirectories))
+            caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.WAV, true));
+        foreach (FileInfo file in info.GetFiles("*.mp3", SearchOption.AllDirectories))
+            caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.MPEG, true));
+        foreach (FileInfo file in info.GetFiles("*.ogg", SearchOption.AllDirectories))
+            caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.OGGVORBIS, true));
+
+        info = new DirectoryInfo(path + "/CyberGrindMusic/Intros");
+        foreach (FileInfo file in info.GetFiles("*.wav", SearchOption.AllDirectories))
+            caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.WAV, false));
+        foreach (FileInfo file in info.GetFiles("*.mp3", SearchOption.AllDirectories))
+            caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.MPEG, false));
+        foreach (FileInfo file in info.GetFiles("*.ogg", SearchOption.AllDirectories))
+            caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.OGGVORBIS, false));
+    }
+
+    private static IEnumerator StartNewWWWCg(string path, AudioType type, bool isLoop)
+    {
+
+        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(path, type))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError)
+            {
+                Debug.Log("couldn't load clip " + path);
+                Debug.Log(www.error);
+            }
+            else
+            {
+                if (isLoop)
+                {
+                    AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
+                    ClipData newData = new ClipData(new FileInfo(path), clip, true);
+                    cgMusic.Add(newData);
+                }
+                else
+                {
+                    AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
+                    ClipData newData = new ClipData(new FileInfo(path), clip, false);
+                    cgMusicIntro.Add(newData);
+                }
+            }
+        }
+    }
+
+    public static void GetCurrentCybergrindIntroSong(AudioSource source)
+    {
+        if (cgMusicIntro.Count <= 0)
+            return;
+        if (selectedCgMusicIntro == null)
+            source.clip = cgMusicIntro[(int)Random.Range(0, cgMusicIntro.Count)].clip;
+        else
+            source.clip = selectedCgMusicIntro.clip;
+    }
+
+    public static void GetCurrentCybergrindSong(ref AudioClip clean, ref AudioClip battle, ref AudioClip boss)
+    {
+        if (cgMusic.Count <= 0)
+            return;
+        if (selectedCgMusic == null)
+        {
+            clean = cgMusic[(int)Random.Range(0, cgMusicIntro.Count)].clip;
+            battle = clean;
+            boss = clean;
+        }
+        else
+        {
+            clean = selectedCgMusic.clip;
+            battle = clean;
+            boss = clean;
+        }
+    }
+
+    public static void SetCurrentSoundPack(string name, SoundPackType type, bool setPersistent = true)
     {
         if (name == "")
             name = "Stock";
@@ -188,6 +270,8 @@ public static class SoundPackController
             SetCurrentSoundPack("Stock", type);
             return;
         }
+        if (setPersistent)
+            Plugin.instance.SetSoundPackPersistent(name, type);
         foreach (Revolver r in Resources.FindObjectsOfTypeAll<Revolver>())
             Inject_RevolverSounds.Postfix(r);
         foreach (Railcannon r in Resources.FindObjectsOfTypeAll<Railcannon>())
@@ -395,6 +479,49 @@ public static class SoundPackController
         {
             this.name = name;
             this.path = "\\" + path + "\\" + folderName + "\\";
+        }
+    }
+
+    public class ClipData
+    {
+        public string title;
+        public AudioClip clip;
+        public Texture2D image;
+        public bool isLoop;
+
+        public ClipData(FileInfo info, AudioClip clip, bool isLoop) // thanks https://answers.unity.com/questions/1461776/how-can-i-access-metadata-from-mp3-such-as-artist.html
+        {
+            this.clip = clip;
+            this.isLoop = isLoop;
+            var tfile = TagLib.File.Create(info.FullName);
+            //get metadata
+            if (tfile.Tag != null)
+            {
+                if (string.IsNullOrEmpty(tfile.Tag.Title))
+                    title = info.Name;
+                else
+                    title = tfile.Tag.Title;
+                if (title.Length > 22)
+                    title = title.Substring(0, 22);
+                if (tfile.Tag.Pictures.Length > 0)
+                {
+                    TagLib.IPicture pic = tfile.Tag.Pictures[0];
+                    MemoryStream ms = new MemoryStream(pic.Data.Data);
+                    ms.Seek(0, SeekOrigin.Begin);
+                    image = new Texture2D(2, 2);
+                    image.LoadRawTextureData(ms.ToArray());
+                }
+            }
+            else
+            {
+                title = info.Name;
+                if (title.Length > 22)
+                    title = title.Substring(0, 22);
+            }
+            if (isLoop && title == persistentLoopName )
+                selectedCgMusic = this;
+            else if (!isLoop && title == persistentIntroName)
+                selectedCgMusicIntro = this;
         }
     }
 
