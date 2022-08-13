@@ -501,8 +501,8 @@ public static class SoundPackController
                     title = info.Name;
                 else
                     title = tfile.Tag.Title;
-                if (title.Length > 22)
-                    title = title.Substring(0, 22);
+                if (title.Length > 23)
+                    title = title.Substring(0, 23);
                 if (tfile.Tag.Pictures.Length > 0)
                 {
                     TagLib.IPicture pic = tfile.Tag.Pictures[0];
@@ -515,8 +515,8 @@ public static class SoundPackController
             else
             {
                 title = info.Name;
-                if (title.Length > 22)
-                    title = title.Substring(0, 22);
+                if (title.Length > 23)
+                    title = title.Substring(0, 23);
             }
             if (isLoop && title == persistentLoopName )
                 selectedCgMusic = this;
