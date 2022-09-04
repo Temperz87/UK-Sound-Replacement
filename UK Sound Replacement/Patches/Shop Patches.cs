@@ -7,7 +7,7 @@ using UnityEngine.UI;
 [HarmonyPatch(typeof(ShopZone), "Start")]
 public static class Inject_SoundPackShops
 {
-    public static void Prefix(ShopZone __instance) // This function s just spahgetti code, I'm sorry
+    public static void Prefix(ShopZone __instance) // This function's just spahgetti code, I'm sorry
     {
         if (__instance.transform.Find("Canvas").Find("Weapons") != null) // just a sanity check that we're not messing with a testament
         {
@@ -24,6 +24,7 @@ public static class Inject_SoundPackShops
             Transform newArmsButton = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Weapons").Find("ArmButton").gameObject, __instance.transform.Find("Canvas").Find("Weapons")).transform;
             newArmsButton.localPosition = new Vector3(-180f, -144.7f, -45.00326f);
             newArmsButton.gameObject.GetComponentInChildren<Text>(true).text = "SOUND PACKS";
+            GameObject.Destroy(newArmsButton.GetComponent<ShopCategory>());
             ShopButton button = newArmsButton.GetComponent<ShopButton>();
             button.toActivate = new GameObject[]
             {
@@ -37,6 +38,7 @@ public static class Inject_SoundPackShops
                 __instance.transform.Find("Canvas").Find("Weapons").Find("ShotgunWindow").gameObject,
                 __instance.transform.Find("Canvas").Find("Weapons").Find("NailgunWindow").gameObject,
                 __instance.transform.Find("Canvas").Find("Weapons").Find("RailcannonWindow").gameObject,
+                __instance.transform.Find("Canvas").Find("Weapons").Find("RocketLauncherWindow").gameObject,
                 __instance.transform.Find("Canvas").Find("Weapons").Find("ArmWindow").gameObject,
             };
             newArmsButton.GetComponent<Button>().onClick.AddListener(delegate
@@ -53,6 +55,8 @@ public static class Inject_SoundPackShops
             ShopButton ngShopButton = ngButton.gameObject.GetComponent<ShopButton>();
             Transform rcButton = __instance.transform.Find("Canvas").Find("Weapons").Find("RailcannonButton");
             ShopButton rcShopButton = rcButton.gameObject.GetComponent<ShopButton>();
+            Transform rlButton = __instance.transform.Find("Canvas").Find("Weapons").Find("RocketLauncherButton");
+            ShopButton rlShopButton = rlButton.gameObject.GetComponent<ShopButton>();
             ShopButton armShopButton = __instance.transform.Find("Canvas").Find("Weapons").Find("ArmButton").gameObject.GetComponent<ShopButton>();
             ShopButton backShopButton = __instance.transform.Find("Canvas").Find("Weapons").Find("BackButton (1)").gameObject.GetComponent<ShopButton>();
             SoundPackController.SoundPack selectedPack = null;
@@ -76,6 +80,10 @@ public static class Inject_SoundPackShops
             rcShopButton.toDeactivate = rcShopButton.toDeactivate.AddToArray(newPageParent);
             rcShopButton.toDeactivate = rcShopButton.toDeactivate.AddToArray(editingText.gameObject);
             rcShopButton.toDeactivate = rcShopButton.toDeactivate.AddToArray(enemies.gameObject);
+
+            rlShopButton.toDeactivate = rlShopButton.toDeactivate.AddToArray(newPageParent);
+            rlShopButton.toDeactivate = rlShopButton.toDeactivate.AddToArray(editingText.gameObject);
+            rlShopButton.toDeactivate = rlShopButton.toDeactivate.AddToArray(enemies.gameObject);
 
             armShopButton.toDeactivate = armShopButton.toDeactivate.AddToArray(newPageParent);
             armShopButton.toDeactivate = armShopButton.toDeactivate.AddToArray(editingText.gameObject);
@@ -156,8 +164,25 @@ public static class Inject_SoundPackShops
                 toSet.Add(rcImage);
             });
 
+            Transform newRl = GameObject.Instantiate(rlButton, newPageParent.transform);
+            newRl.localPosition = new Vector3(0f, -55f, -45f);
+            newRl.GetComponent<ShopButton>().toActivate = new GameObject[] { };
+            newRl.GetComponent<ShopButton>().toDeactivate = new GameObject[] { };
+            Image rlImage = newRl.GetChild(0).GetComponent<Image>();
+            newRl.GetComponent<Button>().onClick.AddListener(delegate
+            {
+                SoundPackController.SetCurrentSoundPack(selectedPack.name, SoundPackController.SoundPackType.RocketLauncher);
+
+                AudioSource source = GameObject.Instantiate(newRl.GetComponent<ShopButton>().clickSound).GetComponent<AudioSource>();
+                source.volume = 1f;
+                SoundPackController.SetAudioSourceClip(source, "Random", SoundPackController.SoundPackType.RocketLauncher);
+                source.Play();
+
+                toSet.Add(rlImage);
+            });
+
             Transform newAll = GameObject.Instantiate(rcButton, newPageParent.transform);
-            newAll.localPosition = new Vector3(0f, -55f, -45f);
+            newAll.localPosition = new Vector3(0f, -85f, -45f);
             newAll.GetComponent<ShopButton>().toActivate = new GameObject[] { };
             newAll.GetComponent<ShopButton>().toDeactivate = new GameObject[] { };
             newAll.gameObject.transform.GetComponentInChildren<Text>().text = "ALL";
@@ -168,6 +193,7 @@ public static class Inject_SoundPackShops
                 toSet.Add(sgImage);
                 toSet.Add(ngImage);
                 toSet.Add(rcImage);
+                toSet.Add(rlImage);
 
                 AudioSource source = GameObject.Instantiate(newRc.GetComponent<ShopButton>().clickSound).GetComponent<AudioSource>();
                 source.volume = 1f;
@@ -176,7 +202,7 @@ public static class Inject_SoundPackShops
             });
 
             Transform newBack = GameObject.Instantiate(rcButton, newPageParent.transform);
-            newBack.localPosition = new Vector3(0f, -85f, -45f);
+            newBack.localPosition = new Vector3(0f, -115f, -45f);
             newBack.localScale = new Vector3(0.74757f, 0.74757f, 0.74757f);
             newBack.GetComponent<ShopButton>().toActivate = new GameObject[] { contentParent.gameObject };
             newBack.GetComponent<ShopButton>().toDeactivate = new GameObject[] { newPageParent };
@@ -306,6 +332,10 @@ public static class Inject_SoundPackShops
                         toSet.Add(rcImage);
                     else
                         rcImage.color = new Color32(255, 255, 255, 255);
+                    if (SoundPackController.rocketLauncherSoundPack == pack)
+                        toSet.Add(rlImage);
+                    else
+                        rlImage.color = new Color32(255, 255, 255, 255);
                     contentParent.gameObject.SetActive(false);
                 });
 
@@ -330,7 +360,6 @@ public static class Inject_CgMusicSelector
     {
         if (__instance.transform.Find("Canvas").Find("Waves") != null)
         {
-
             GameObject newPage = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Patterns").gameObject, __instance.transform.Find("Canvas"));
             newPage.SetActive(false);
             newPage.transform.Find("Panel").Find("StateButton").gameObject.SetActive(false);
@@ -356,13 +385,47 @@ public static class Inject_CgMusicSelector
             exampleButton.SetActive(true);
             GameObject text = customStuff.Find("PageText").gameObject;
             text.SetActive(true);
+
+            GameObject randomButton = GameObject.Instantiate(exampleButton, exampleButton.transform.parent);
+            Button rButton = randomButton.GetComponent<Button>();
+            rButton.onClick.AddListener(delegate
+            {
+                SoundPackController.persistentLoopName = "Random";
+                Plugin.instance.SetPersistentModData("cgLoop", "Random");
+            });
+            rButton.targetGraphic.color = new Color32(125, 125, 125, 255);
+            GameObject newRText = GameObject.Instantiate(text, randomButton.transform);
+            newRText.transform.localPosition = new Vector3(40f, 10f, 0f);
+            newRText.transform.localEulerAngles = new Vector3(0f, 0f, 180f);
+            newRText.transform.localScale = new Vector3(-1f, 1f, 1f);
+            Text titleRText = newRText.GetComponent<Text>();
+            titleRText.resizeTextForBestFit = true;
+            titleRText.text = "Random";
+            
+            GameObject stockButton = GameObject.Instantiate(exampleButton, exampleButton.transform.parent);
+            Button sButton = stockButton.GetComponent<Button>();
+            sButton.onClick.AddListener(delegate
+            {
+                SoundPackController.persistentLoopName = "Stock";
+                Plugin.instance.SetPersistentModData("cgLoop", "Stock");
+            });
+            sButton.targetGraphic.color = new Color32(125, 125, 125, 255);
+            GameObject newSText = GameObject.Instantiate(text, sButton.transform);
+            newSText.transform.localPosition = new Vector3(40f, 10f, 0f);
+            newSText.transform.localEulerAngles = new Vector3(0f, 0f, 180f);
+            newSText.transform.localScale = new Vector3(-1f, 1f, 1f);
+            Text titleSText = newSText.GetComponent<Text>();
+            titleSText.resizeTextForBestFit = true;
+            titleSText.text = "Stock";
+
+
             foreach (SoundPackController.ClipData clip in SoundPackController.cgMusic)
             {
                 GameObject musicButton = GameObject.Instantiate(exampleButton, exampleButton.transform.parent);
                 Button button = musicButton.GetComponent<Button>();
                 button.onClick.AddListener(delegate
                 {
-                    SoundPackController.selectedCgMusic = clip;
+                    SoundPackController.persistentLoopName = clip.title;
                     Plugin.instance.SetPersistentModData("cgLoop", clip.title);
                 });
                 button.targetGraphic.color = new Color32(125, 125, 125, 255);
@@ -381,13 +444,46 @@ public static class Inject_CgMusicSelector
             exampleButton.SetActive(true);
             text = customStuff.Find("PageText").gameObject;
             text.SetActive(true);
+
+            GameObject randomIntroButton = GameObject.Instantiate(exampleButton, exampleButton.transform.parent);
+            Button rIButton = randomIntroButton.GetComponent<Button>();
+            rIButton.onClick.AddListener(delegate
+            {
+                SoundPackController.persistentIntroName = "Random";
+                Plugin.instance.SetPersistentModData("cgIntro", "Random");
+            });
+            rIButton.targetGraphic.color = new Color32(125, 125, 125, 255);
+            GameObject newRIText = GameObject.Instantiate(text, randomIntroButton.transform);
+            newRIText.transform.localPosition = new Vector3(40f, 10f, 0f);
+            newRIText.transform.localEulerAngles = new Vector3(0f, 0f, 180f);
+            newRIText.transform.localScale = new Vector3(-1f, 1f, 1f);
+            Text titleRIText = newRIText.GetComponent<Text>();
+            titleRIText.resizeTextForBestFit = true;
+            titleRIText.text = "Random";
+
+            GameObject stockIntroButton = GameObject.Instantiate(exampleButton, exampleButton.transform.parent);
+            Button sIButton = stockIntroButton.GetComponent<Button>();
+            sIButton.onClick.AddListener(delegate
+            {
+                SoundPackController.persistentIntroName = "Stock";
+                Plugin.instance.SetPersistentModData("cgIntro", "Stock");
+            });
+            sIButton.targetGraphic.color = new Color32(125, 125, 125, 255);
+            GameObject newSIText = GameObject.Instantiate(text, stockIntroButton.transform);
+            newSIText.transform.localPosition = new Vector3(40f, 10f, 0f);
+            newSIText.transform.localEulerAngles = new Vector3(0f, 0f, 180f);
+            newSIText.transform.localScale = new Vector3(-1f, 1f, 1f);
+            Text titleSIText = newSIText.GetComponent<Text>();
+            titleSIText.resizeTextForBestFit = true;
+            titleSIText.text = "Stock";
+
             foreach (SoundPackController.ClipData clip in SoundPackController.cgMusicIntro)
             {
                 GameObject musicButton = GameObject.Instantiate(exampleButton, exampleButton.transform.parent);
                 Button button = musicButton.GetComponent<Button>();
                 button.onClick.AddListener(delegate
                 {
-                    SoundPackController.selectedCgMusicIntro = clip;
+                    SoundPackController.persistentIntroName = clip.title;
                     Plugin.instance.SetPersistentModData("cgIntro", clip.title);
                 });
                 button.targetGraphic.color = new Color32(125, 125, 125, 255);

@@ -34,8 +34,9 @@
     <Reference Include="0Harmony">
       <HintPath>D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\BepInEx\core\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\ULTRAKILL_Data\Managed\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ULTRAKILL\ULTRAKILL_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -52,8 +53,8 @@
     <Reference Include="TagLibSharp, Version=2.3.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=MSIL">
       <HintPath>..\packages\TagLibSharp.2.3.0\lib\net462\TagLibSharp.dll</HintPath>
     </Reference>
-    <Reference Include="UKMM">
-      <HintPath>D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\BepInEx\plugins\UKMM\UKMM.dll</HintPath>
+    <Reference Include="UMM">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ULTRAKILL\BepInEx\plugins\UMM\UMM.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\ULTRAKILL_Data\Managed\UnityEngine.dll</HintPath>
@@ -105,6 +106,7 @@
   <ItemGroup>
     <Compile Include="Patches\CyberGrind Patches.cs" />
     <Compile Include="Patches\Nailgun Patches.cs" />
+    <Compile Include="Patches\RocketLauncher Patches.cs" />
     <Compile Include="Patches\Shop Patches.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -121,6 +123,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\BepInEx\UKMM Mods\UKSoundReplacement\UKSoundReplacement.dll"</PostBuildEvent>
+    <PostBuildEvent>IF EXIST "D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\" (
+    copy "$(TargetPath)" "D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\BepInEx\UKMM Mods\UKSoundReplacement\UKSoundReplacement.dll"
+)
+IF EXIST "C:\Program Files (x86)\Steam\steamapps\common\ULTRAKILL\BepInEx\UMM Mods\UKSoundReplacement" (
+    copy "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\ULTRAKILL\BepInEx\UMM Mods\UKSoundReplacement\UKSoundReplacement.dll"
+)</PostBuildEvent>
   </PropertyGroup>
 </Project>

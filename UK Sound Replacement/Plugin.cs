@@ -3,12 +3,12 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UKMM;
+using UMM;
 using System.Reflection;
 
-[UKPlugin("UKSoundReplacement", "1.0.0", "Replaces gun sounds in game from sound packs", true, true)]
+[UKPlugin("UKSoundReplacement", "2.0.0", "Replaces gun sounds and cybergrind music from sound packs", true, true)]
 public class Plugin : UKMod
-{
+{   
     public static Plugin instance { get; private set; }
     private static Harmony harmony;
 
@@ -52,6 +52,9 @@ public class Plugin : UKMod
         object rc = RetrieveStringPersistentModData("rc");
         if (rc != null)
             SoundPackController.SetCurrentSoundPack(rc.ToString(), SoundPackController.SoundPackType.Railcannon);
+        object rl = RetrieveStringPersistentModData("rl");
+        if (rl != null)
+            SoundPackController.SetCurrentSoundPack(rl.ToString(), SoundPackController.SoundPackType.RocketLauncher);
         object cgLoop = RetrieveStringPersistentModData("cgLoop");
         if (cgLoop != null)
             SoundPackController.persistentLoopName = cgLoop.ToString();
@@ -78,11 +81,15 @@ public class Plugin : UKMod
             case SoundPackController.SoundPackType.Railcannon:
                 SetPersistentModData("rc", name);
                 return;
+            case SoundPackController.SoundPackType.RocketLauncher:
+                SetPersistentModData("rl", name);
+                return;
             case SoundPackController.SoundPackType.All:
                 SetPersistentModData("rev", name);
                 SetPersistentModData("sg", name);
                 SetPersistentModData("ng", name);
                 SetPersistentModData("rc", name);
+                SetPersistentModData("rl", name);
                 return;
         }
     }

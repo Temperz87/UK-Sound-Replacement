@@ -7,9 +7,7 @@ using UnityEngine.Networking;
 
 public static class SoundPackController
 {
-    public static ClipData selectedCgMusic = null;
     public static string persistentLoopName = "";
-    public static ClipData selectedCgMusicIntro = null;
     public static string persistentIntroName = "";
     public static List<ClipData> cgMusic { get; private set; } = new List<ClipData>();
     public static List<ClipData> cgMusicIntro { get; private set; } = new List<ClipData>();
@@ -19,6 +17,7 @@ public static class SoundPackController
     public static SoundPack shotgunSoundPack = null;
     public static SoundPack nailgunSoundPack = null;
     public static SoundPack railcannonSoundPack = null;
+    public static SoundPack rocketLauncherSoundPack = null;
 
     private static List<string> stockLoadedAspects = new List<string>();
 
@@ -141,6 +140,15 @@ public static class SoundPackController
         result.AddAspect(new SoundAspect("SawBounce1True", "SawBounce", "NailgunSounds\\NailgunBlueAlt"));
         result.AddAspect(new SoundAspect("SawBounce0True", "SawBounce", "NailgunSounds\\NailgunGreenAlt"));
 
+        // Rocket Launcher blue
+        result.AddAspect(new SoundAspect("RocketLauncherClunkSounds0", "RocketLauncherClunkSounds", "RocketLauncherSounds\\RocketLauncherBlue"));
+        result.AddAspect(new SoundAspect("RocketLauncherExhaustSounds0", "RocketLauncherExhaustSounds", "RocketLauncherSounds\\RocketLauncherBlue"));
+        result.AddAspect(new SoundAspect("RocketLauncherFreezeSounds", "RocketLauncherFreezeSounds", "RocketLauncherSounds\\RocketLauncherBlue"));
+        result.AddAspect(new SoundAspect("RocketLauncherShootSounds0", "RocketLauncherShootSounds", "RocketLauncherSounds\\RocketLauncherBlue"));
+        result.AddAspect(new SoundAspect("RocketLauncherTickSounds", "RocketLauncherTickSounds", "RocketLauncherSounds\\RocketLauncherBlue"));
+        result.AddAspect(new SoundAspect("RocketLauncherUnfreezeSounds", "RocketLauncherUnfreezeSounds", "RocketLauncherSounds\\RocketLauncherBlue"));
+        result.AddAspect(new SoundAspect("RocketLauncherWindUpSounds", "RocketLauncherWindUpSounds", "RocketLauncherSounds\\RocketLauncherBlue"));
+
         allSoundPacks.Add(name, result);
         return result;
     }
@@ -209,28 +217,56 @@ public static class SoundPackController
     {
         if (cgMusicIntro.Count <= 0)
             return;
-        if (selectedCgMusicIntro == null)
-            source.clip = cgMusicIntro[(int)Random.Range(0, cgMusicIntro.Count)].clip;
+        if (persistentIntroName == "Random")
+        {
+            int random = Random.Range(0, cgMusicIntro.Count + 1);
+            if (random != cgMusicIntro.Count)  // accounting for stock song
+                source.clip = cgMusicIntro[random].clip;
+        }
+        else if (persistentIntroName == "Stock")
+            return;
         else
-            source.clip = selectedCgMusicIntro.clip;
+        {
+            foreach (ClipData data in cgMusicIntro)
+            {
+                if (data.title == persistentIntroName)
+                {
+                    source.clip = data.clip;
+                    break;
+                }
+            }
+        }
     }
 
     public static void GetCurrentCybergrindSong(ref AudioClip clean, ref AudioClip battle, ref AudioClip boss)
     {
         if (cgMusic.Count <= 0)
             return;
-        if (selectedCgMusic == null)
+        AudioClip clip = null;
+        if (persistentLoopName == "Random")
         {
-            clean = cgMusic[(int)Random.Range(0, cgMusicIntro.Count)].clip;
-            battle = clean;
-            boss = clean;
+            int random = (int)Random.Range(0, cgMusic.Count + 1);
+            if (random != cgMusic.Count)
+                clip = cgMusic[random].clip;
         }
+        else if (persistentLoopName == "Stock")
+            return;
         else
         {
-            clean = selectedCgMusic.clip;
-            battle = clean;
-            boss = clean;
+            foreach (ClipData data in cgMusic)
+            {
+                if (data.title == persistentLoopName)
+                {
+                    clip = data.clip;
+                    break;
+                }
+            }
         }
+        if (clip == null)
+            return;
+        clean = clip;
+        battle = clean;
+        boss = clean;
     }
 
     public static void SetCurrentSoundPack(string name, SoundPackType type, bool setPersistent = true)
@@ -256,11 +292,15 @@ public static class SoundPackController
                 case SoundPackType.Railcannon:
                     railcannonSoundPack = toSet;
                     break;
+                case SoundPackType.RocketLauncher:
+                    rocketLauncherSoundPack = toSet;
+                    break;
                 case SoundPackType.All:
                     revolverSoundPack = toSet;
                     shotgunSoundPack = toSet;
                     nailgunSoundPack = toSet;
                     railcannonSoundPack = toSet;
+                    rocketLauncherSoundPack = toSet;
                     break;
             }
         }
@@ -280,6 +320,8 @@ public static class SoundPackController
             Inject_ShotgunSounds.Postfix(s);
         foreach (Nailgun n in Resources.FindObjectsOfTypeAll<Nailgun>())
             Inject_NailgunSounds.Postfix(n);
+        foreach (RocketLauncher r in Resources.FindObjectsOfTypeAll<RocketLauncher>())
+            Inject_RocketLauncherSounds.Postfix(r);
     }
 
     public static SoundPack RetrieveSoundPackByType(SoundPackType type)
@@ -294,6 +336,8 @@ public static class SoundPackController
                 return nailgunSoundPack;
             case SoundPackType.Railcannon:
                 return railcannonSoundPack;
+            case SoundPackType.RocketLauncher:
+                return rocketLauncherSoundPack;
         }
         return null;
     }
@@ -371,12 +415,17 @@ public static class SoundPackController
         {
             foreach (SoundAspect aspect in allAspects.Values)
             {
-                foreach (FileInfo file in new DirectoryInfo(info.FullName + aspect.path).GetFiles("*.wav", SearchOption.AllDirectories))
-                    caller.StartCoroutine(StartNewWWW(aspect, file.FullName, AudioType.WAV));
-                foreach (FileInfo file in new DirectoryInfo(info.FullName + aspect.path).GetFiles("*.mp3", SearchOption.AllDirectories))
-                    caller.StartCoroutine(StartNewWWW(aspect, file.FullName, AudioType.MPEG));
-                foreach (FileInfo file in new DirectoryInfo(info.FullName + aspect.path).GetFiles("*.ogg", SearchOption.AllDirectories))
-                    caller.StartCoroutine(StartNewWWW(aspect, file.FullName, AudioType.OGGVORBIS));
+                if (new DirectoryInfo(info.FullName + aspect.path).Exists)
+                {
+                    foreach (FileInfo file in new DirectoryInfo(info.FullName + aspect.path).GetFiles("*.wav", SearchOption.AllDirectories))
+                        caller.StartCoroutine(StartNewWWW(aspect, file.FullName, AudioType.WAV));
+                    foreach (FileInfo file in new DirectoryInfo(info.FullName + aspect.path).GetFiles("*.mp3", SearchOption.AllDirectories))
+                        caller.StartCoroutine(StartNewWWW(aspect, file.FullName, AudioType.MPEG));
+                    foreach (FileInfo file in new DirectoryInfo(info.FullName + aspect.path).GetFiles("*.ogg", SearchOption.AllDirectories))
+                        caller.StartCoroutine(StartNewWWW(aspect, file.FullName, AudioType.OGGVORBIS));
+                }
+                else
+                    Debug.Log("Couldn't find " + info.FullName + aspect.path);
             }
 
             if (File.Exists(info.FullName + "\\preview.png"))
@@ -455,7 +504,10 @@ public static class SoundPackController
         public SoundAspect GetAspect(string name)
         {
             if (!allAspects.ContainsKey(name))
+            {
+                Debug.Log(name + " was requested as a sound aspect but wasn't found!");
                 return null;
+            }
             return allAspects[name];
         }
     }
@@ -518,10 +570,6 @@ public static class SoundPackController
                 if (title.Length > 23)
                     title = title.Substring(0, 23);
             }
-            if (isLoop && title == persistentLoopName )
-                selectedCgMusic = this;
-            else if (!isLoop && title == persistentIntroName)
-                selectedCgMusicIntro = this;
         }
     }
 
@@ -531,6 +579,7 @@ public static class SoundPackController
         Shotgun,
         Nailgun,
         Railcannon,
+        RocketLauncher,
         All
     }
 }
