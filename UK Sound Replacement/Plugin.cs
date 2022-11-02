@@ -6,7 +6,7 @@ using UnityEngine;
 using UMM;
 using System.Reflection;
 
-[UKPlugin("UKSoundReplacement", "2.1.0", "Replaces gun sounds and cybergrind music from sound packs", true, true)]
+[UKPlugin("UKSoundReplacement", "1.3.0", "Replaces gun sounds and cybergrind music from sound packs", true, true)]
 public class Plugin : UKMod
 {   
     public static Plugin instance { get; private set; }
