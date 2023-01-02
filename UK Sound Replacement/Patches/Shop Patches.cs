@@ -45,6 +45,7 @@ public static class Inject_SoundPackShops
             {
                 editingText.text = "SOUND PACKS";
             });
+            newArmsButton.SetAsFirstSibling();
 
             // Grabbing buttons
             Transform revButton = __instance.transform.Find("Canvas").Find("Weapons").Find("RevolverButton");
@@ -417,7 +418,6 @@ public static class Inject_CgMusicSelector
             Text titleSText = newSText.GetComponent<Text>();
             titleSText.resizeTextForBestFit = true;
             titleSText.text = "Stock";
-
 
             foreach (SoundPackController.ClipData clip in SoundPackController.cgMusic)
             {
