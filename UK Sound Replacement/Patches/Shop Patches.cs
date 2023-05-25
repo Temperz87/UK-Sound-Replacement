@@ -354,11 +354,23 @@ public static class Inject_SoundPackShops
     }
 }
 
+[HarmonyPatch(typeof(CustomMusicSoundtrackBrowser), "Rebuild")]
+public static class Inject_CustomCGMusic
+{
+    public static void Postfix(CustomMusicSoundtrackBrowser __instance, List<IDirectoryTree> ___currentDirectory)
+    {
+        
+    }
+}
+
 [HarmonyPatch(typeof(WaveMenu), "Start")]
 public static class Inject_CgMusicSelector
 {
     public static void Prefix(ScreenZone __instance) 
     {
+
+        
+        /*
         if (__instance.transform.Find("Canvas").Find("Waves") != null)
         {
             GameObject newPage = GameObject.Instantiate(__instance.transform.Find("Canvas").Find("Patterns").gameObject, __instance.transform.Find("Canvas"));
@@ -550,5 +562,6 @@ public static class Inject_CgMusicSelector
             wavesButton.toDeactivate = wavesButton.toDeactivate.AddToArray(gridParent.gameObject);
             wavesButton.toDeactivate = wavesButton.toDeactivate.AddToArray(introParent.gameObject);
         }
+        */
     }
 }

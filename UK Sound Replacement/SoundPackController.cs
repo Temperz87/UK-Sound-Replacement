@@ -1,16 +1,19 @@
-﻿using System.Collections;
+﻿using HarmonyLib;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
+using Newtonsoft.Json;
 
 public static class SoundPackController
 {
     public static string persistentLoopName = "";
     public static string persistentIntroName = "";
-    public static List<ClipData> cgMusic { get; private set; } = new List<ClipData>();
-    public static List<ClipData> cgMusicIntro { get; private set; } = new List<ClipData>();
+    //public static List<ClipData> cgMusic { get; private set; } = new List<ClipData>();
+    //public static List<ClipData> cgMusicIntro { get; private set; } = new List<ClipData>();
+    public static List<SoundtrackSong> allCGSongs = new List<SoundtrackSong>();
     private static Dictionary<string, SoundPack> allSoundPacks = new Dictionary<string, SoundPack>();
 
     public static SoundPack revolverSoundPack = null;
@@ -62,27 +65,40 @@ public static class SoundPackController
         result.AddAspect(new SoundAspect("RevolverShootSounds0True", "ShootSounds", "RevolverSounds\\RevolverPiercerAlt"));
         result.AddAspect(new SoundAspect("RevolverSuperShootSounds0True", "SuperShootSounds", "RevolverSounds\\RevolverPiercerAlt"));
         result.AddAspect(new SoundAspect("HammerClick0", "HammerClick", "RevolverSounds\\RevolverPiercerAlt"));
-        
+
         // Green
-        result.AddAspect(new SoundAspect("CoinBreak1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman"));
+        //result.AddAspect(new SoundAspect("CoinBreak1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman"));
         result.AddAspect(new SoundAspect("CoinFlashLoop1False", "CoinFlashLoop", "RevolverSounds\\RevolverMarksman"));
         result.AddAspect(new SoundAspect("CoinFlip1False", "CoinFlip", "RevolverSounds\\RevolverMarksman"));
         result.AddAspect(new SoundAspect("CoinReady1False", "CoinReady", "RevolverSounds\\RevolverMarksman"));
         result.AddAspect(new SoundAspect("CoinSpin1False", "CoinSpin", "RevolverSounds\\RevolverMarksman"));
-        result.AddAspect(new SoundAspect("CoinTwirl1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman"));
+        //result.AddAspect(new SoundAspect("CoinTwirl1False", "CoinTwirl", "RevolverSounds\\RevolverMarksman"));
         result.AddAspect(new SoundAspect("CoinRicochet1False", "Ricochet", "RevolverSounds\\RevolverMarksman"));
         result.AddAspect(new SoundAspect("RevolverShootSounds1False", "ShootSounds", "RevolverSounds\\RevolverMarksman"));
-        
+
         // Green alt
-        result.AddAspect(new SoundAspect("CoinBreak1True", "CoinTwirl", "RevolverSounds\\RevolverMarksmanAlt"));
+        //result.AddAspect(new SoundAspect("CoinBreak1True", "CoinTwirl", "RevolverSounds\\RevolverMarksmanAlt"));
         result.AddAspect(new SoundAspect("CoinFlashLoop1True", "CoinFlashLoop", "RevolverSounds\\RevolverMarksmanAlt"));
         result.AddAspect(new SoundAspect("CoinFlip1True", "CoinFlip", "RevolverSounds\\RevolverMarksmanAlt"));
         result.AddAspect(new SoundAspect("CoinReady1True", "CoinReady", "RevolverSounds\\RevolverMarksmanAlt"));
         result.AddAspect(new SoundAspect("CoinSpin1True", "CoinSpin", "RevolverSounds\\RevolverMarksmanAlt"));
-        result.AddAspect(new SoundAspect("CoinTwirl1True", "CoinTwirl", "RevolverSounds\\RevolverMarksmanAlt"));
+        //result.AddAspect(new SoundAspect("CoinTwirl1True", "CoinTwirl", "RevolverSounds\\RevolverMarksmanAlt"));
         result.AddAspect(new SoundAspect("CoinRicochet1True", "Ricochet", "RevolverSounds\\RevolverMarksmanAlt"));
         result.AddAspect(new SoundAspect("RevolverShootSounds1True", "ShootSounds", "RevolverSounds\\RevolverMarksmanAlt"));
         result.AddAspect(new SoundAspect("HammerClick1", "HammerClick", "RevolverSounds\\RevolverMarksmanAlt"));
+
+        // Red
+        result.AddAspect(new SoundAspect("RevolverShootSounds2False", "ShootSounds", "RevolverSounds\\RevolverSharpshooter"));
+        result.AddAspect(new SoundAspect("RevolverSuperShootSounds2False", "SuperShootSounds", "RevolverSounds\\RevolverSharpshooter"));
+        result.AddAspect(new SoundAspect("TwirlChargedFalse", "TwirlCharged", "RevolverSounds\\RevolverSharpshooter"));
+        result.AddAspect(new SoundAspect("TwirlSoundFalse", "TwirlSound", "RevolverSounds\\RevolverSharpshooter"));
+
+        // Red alt
+        result.AddAspect(new SoundAspect("RevolverShootSounds2True", "ShootSounds", "RevolverSounds\\RevolverSharpshooterAlt"));
+        result.AddAspect(new SoundAspect("RevolverSuperShootSounds2True", "SuperShootSounds", "RevolverSounds\\RevolverSharpshooterAlt"));
+        result.AddAspect(new SoundAspect("TwirlChargedTrue", "TwirlCharged", "RevolverSounds\\RevolverSharpshooterAlt"));
+        result.AddAspect(new SoundAspect("TwirlSoundTrue", "TwirlSound", "RevolverSounds\\RevolverSharpshooterAlt"));
+        result.AddAspect(new SoundAspect("HammerClick2", "HammerClick", "RevolverSounds\\RevolverSharpshooterAlt"));
 
         // Shotgun
 
@@ -159,6 +175,14 @@ public static class SoundPackController
         result.AddAspect(new SoundAspect("RocketLauncherWindUpSounds", "RocketLauncherWindUpSounds", "RocketLauncherSounds\\RocketLauncherBlue"));
 
         // Rocket Launcher Green
+        result.AddAspect(new SoundAspect("RocketLauncherClunkSounds1", "RocketLauncherClunkSounds", "RocketLauncherSounds\\RocketLauncherGreen"));
+        result.AddAspect(new SoundAspect("RocketLauncherExhaustSounds1", "RocketLauncherExhaustSounds", "RocketLauncherSounds\\RocketLauncherGreen"));
+        result.AddAspect(new SoundAspect("RocketLauncherShootSounds1", "RocketLauncherShootSounds", "RocketLauncherSounds\\RocketLauncherGreen"));
+        result.AddAspect(new SoundAspect("RocketLauncherCannonballShootSounds", "RocketLauncherCannonballShootSounds", "RocketLauncherSounds\\RocketLauncherGreen"));
+        result.AddAspect(new SoundAspect("RocketLauncherCannonballChargeUp", "RocketLauncherCannonballChargeUp", "RocketLauncherSounds\\RocketLauncherGreen"));
+        result.AddAspect(new SoundAspect("RocketLauncherCannonballTimerWindUp", "RocketLauncherCannonballTimerWindUp", "RocketLauncherSounds\\RocketLauncherGreen"));
+        result.AddAspect(new SoundAspect("RocketLauncherCannonballBounce", "RocketLauncherCannonballBounce", "RocketLauncherSounds\\RocketLauncherGreen"));
+
 
         allSoundPacks.Add(name, result);
         return result;
@@ -177,24 +201,51 @@ public static class SoundPackController
             Directory.CreateDirectory(info.FullName);
             yield break;
         }
-        info = new DirectoryInfo(path + "/CyberGrindMusic/Loops");
-        foreach (FileInfo file in info.GetFiles("*.wav", SearchOption.AllDirectories))
-            caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.WAV, true));
-        foreach (FileInfo file in info.GetFiles("*.mp3", SearchOption.AllDirectories))
-            caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.MPEG, true));
-        foreach (FileInfo file in info.GetFiles("*.ogg", SearchOption.AllDirectories))
-            caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.OGGVORBIS, true));
 
-        info = new DirectoryInfo(path + "/CyberGrindMusic/Intros");
-        foreach (FileInfo file in info.GetFiles("*.wav", SearchOption.AllDirectories))
-            caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.WAV, false));
-        foreach (FileInfo file in info.GetFiles("*.mp3", SearchOption.AllDirectories))
-            caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.MPEG, false));
-        foreach (FileInfo file in info.GetFiles("*.ogg", SearchOption.AllDirectories))
-            caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.OGGVORBIS, false));
+        foreach (DirectoryInfo subdirectory in info.GetDirectories())
+        {
+            FileInfo fInfo = new FileInfo(subdirectory.FullName + "\\song.json");
+            if (!fInfo.Exists)
+                continue;
+            // convert fInfo json file into a dictionary
+
+            string songName = "";
+            string introClip = "";
+            using (StreamReader jFile = fInfo.OpenText())
+            {
+                Dictionary<string, string> jValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(jFile.ReadToEnd());
+                if (jValues.ContainsKey("Song Name"))
+                    songName = jValues["Song name"];
+                if (!jValues.ContainsKey("Intro"))
+                    continue;
+                introClip = jValues["Intro"];
+            }
+
+            SoundtrackSong song = new SoundtrackSong();
+
+            foreach (FileInfo file in subdirectory.GetFiles("*.wav", SearchOption.AllDirectories))
+                caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.WAV, introClip, song));
+
+            /*
+            info = new DirectoryInfo(path + "/CyberGrindMusic/Loops");
+            foreach (FileInfo file in info.GetFiles("*.wav", SearchOption.AllDirectories))
+                caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.WAV, true));
+            foreach (FileInfo file in info.GetFiles("*.mp3", SearchOption.AllDirectories))
+                caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.MPEG, true));
+            foreach (FileInfo file in info.GetFiles("*.ogg", SearchOption.AllDirectories))
+                caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.OGGVORBIS, true));
+
+            info = new DirectoryInfo(path + "/CyberGrindMusic/Intros");
+            foreach (FileInfo file in info.GetFiles("*.wav", SearchOption.AllDirectories))
+                caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.WAV, false));
+            foreach (FileInfo file in info.GetFiles("*.mp3", SearchOption.AllDirectories))
+                caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.MPEG, false));
+            foreach (FileInfo file in info.GetFiles("*.ogg", SearchOption.AllDirectories))
+                caller.StartCoroutine(StartNewWWWCg(file.FullName, AudioType.OGGVORBIS, false));
+            */
+        }
     }
-
-    private static IEnumerator StartNewWWWCg(string path, AudioType type, bool isLoop)
+    private static IEnumerator StartNewWWWCg(string path, AudioType type, string introName, SoundtrackSong song)
     {
 
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(path, type))
@@ -208,25 +259,18 @@ public static class SoundPackController
             }
             else
             {
-                if (isLoop)
-                {
-                    AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
-                    ClipData newData = new ClipData(new FileInfo(path), clip, true);
-                    cgMusic.Add(newData);
-                }
+                AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
+                if (clip.name == introName)
+                    song.introClip = clip;
                 else
-                {
-                    AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
-                    ClipData newData = new ClipData(new FileInfo(path), clip, false);
-                    cgMusicIntro.Add(newData);
-                }
+                    song.clips.Add(clip);
             }
         }
     }
 
     public static void GetCurrentCybergrindIntroSong(AudioSource source)
     {
-        if (cgMusicIntro.Count <= 0)
+        /*if (cgMusicIntro.Count <= 0)
             return;
         if (persistentIntroName == "Random")
         {
@@ -246,11 +290,12 @@ public static class SoundPackController
                     break;
                 }
             }
-        }
+        }*/
     }
 
     public static void GetCurrentCybergrindSong(ref AudioClip clean, ref AudioClip battle, ref AudioClip boss)
     {
+        /*
         if (cgMusic.Count <= 0)
             return;
         AudioClip clip = null;
@@ -278,6 +323,7 @@ public static class SoundPackController
         clean = clip;
         battle = clean;
         boss = clean;
+        */
     }
 
     public static void SetCurrentSoundPack(string name, SoundPackType type, bool setPersistent = true)
@@ -318,7 +364,8 @@ public static class SoundPackController
         else
         {
             Debug.Log("Tried to set current soundpack to " + name + " but it wasn't found!");
-            SetCurrentSoundPack("Stock", type);
+            if (name != "Stock")
+                SetCurrentSoundPack("Stock", type);
             return;
         }
         if (setPersistent)
@@ -332,7 +379,7 @@ public static class SoundPackController
         foreach (Nailgun n in Resources.FindObjectsOfTypeAll<Nailgun>())
             Inject_NailgunSounds.Postfix(n);
         foreach (RocketLauncher r in Resources.FindObjectsOfTypeAll<RocketLauncher>())
-            Inject_RocketLauncherSounds.Postfix(r);
+            Inject_RocketLauncherSounds.Postfix(r, Traverse.Create(r).Field("chargeSound").GetValue() as AudioSource);
     }
 
     public static SoundPack RetrieveSoundPackByType(SoundPackType type)
@@ -507,8 +554,16 @@ public static class SoundPackController
 
         public AudioClip[] GetAllAudioClipsOfAspect(string name)
         {
-            if (allAspects[name] == null)
+            if (!allAspects.ContainsKey(name))
+            {
+                Debug.Log(name + " was requested to get all audio clips, however it wasn't found!");
                 return null;
+            }
+            if (allAspects[name] == null)
+            {
+                Debug.Log(name + " was requested to get all audio clips, however it's null!");
+                return null;
+            }
             return (AudioClip[])allAspects[name].allClips.ToArray().Clone();
         }
 

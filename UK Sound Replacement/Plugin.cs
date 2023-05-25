@@ -55,13 +55,15 @@ public class Plugin : UKMod
         object rl = RetrieveStringPersistentModData("rl");
         if (rl != null)
             SoundPackController.SetCurrentSoundPack(rl.ToString(), SoundPackController.SoundPackType.RocketLauncher);
+        
+        /*
         object cgLoop = RetrieveStringPersistentModData("cgLoop");
         if (cgLoop != null)
             SoundPackController.persistentLoopName = cgLoop.ToString();
         object cgIntro = RetrieveStringPersistentModData("cgIntro");
         if (cgIntro != null)
             SoundPackController.persistentIntroName = cgIntro.ToString();
-
+        */
     }
 
     public void SetSoundPackPersistent(string name, SoundPackController.SoundPackType type)
