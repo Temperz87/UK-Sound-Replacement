@@ -24,9 +24,9 @@ public static class Inject_RevolverSounds
                 if (source.name == "Bone_001")
                     SoundPackController.SetAudioSourceClip(source, "ClickCancel" + __instance.gunVariation + __instance.altVersion.ToString(), SoundPackController.SoundPackType.Revolver);
         }
-        else
+        else if (__instance.gunVariation == 1)
         {
-            SoundPackController.SetAudioClip(ref __instance.twirlSound, "CoinTwirl" + __instance.gunVariation + __instance.altVersion.ToString(), SoundPackController.SoundPackType.Revolver);
+            //SoundPackController.SetAudioClip(ref __instance.twirlSound, "CoinTwirl" + __instance.gunVariation + __instance.altVersion.ToString(), SoundPackController.SoundPackType.Revolver);
             SoundPackController.SetAudioSourceClip(__instance.GetComponentInChildren<Canvas>().gameObject.GetComponent<AudioSource>(), "CoinReady" + __instance.gunVariation + __instance.altVersion.ToString(), SoundPackController.SoundPackType.Revolver);
             SoundPackController.SetAudioSourceClip(__instance.coin.GetComponent<AudioSource>(), "CoinFlip" + __instance.gunVariation + __instance.altVersion.ToString(), SoundPackController.SoundPackType.Revolver);
             SoundPackController.SetAudioSourceClip(__instance.coin.transform.GetChild(0).GetComponent<AudioSource>(), "CoinSpin" + __instance.gunVariation + __instance.altVersion.ToString(), SoundPackController.SoundPackType.Revolver);
@@ -37,6 +37,10 @@ public static class Inject_RevolverSounds
             SoundPackController.SetAudioSourceClip(coin.coinHitSound.GetComponents<AudioSource>()[0], "CoinRicochet" + __instance.gunVariation + __instance.altVersion.ToString(), SoundPackController.SoundPackType.Revolver);
             SoundPackController.SetAudioSourceClip(coin.coinHitSound.GetComponents<AudioSource>()[1], "CoinFlip" + __instance.gunVariation + __instance.altVersion.ToString(), SoundPackController.SoundPackType.Revolver);
             SoundPackController.SetAudioSourceClip(coin.chargeEffect.GetComponent<AudioSource>(), "CoinFlashLoop" + __instance.gunVariation + __instance.altVersion.ToString(), SoundPackController.SoundPackType.Revolver);
+        }
+        else if (__instance.gunVariation == 2)
+        {
+            
         }
     }
 }

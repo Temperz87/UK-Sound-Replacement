@@ -36,7 +36,7 @@
     </Reference>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ULTRAKILL\ULTRAKILL_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\ULTRAKILL_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -54,7 +54,7 @@
       <HintPath>..\packages\TagLibSharp.2.3.0\lib\net462\TagLibSharp.dll</HintPath>
     </Reference>
     <Reference Include="UMM">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ULTRAKILL\BepInEx\plugins\UMM\UMM.dll</HintPath>
+      <HintPath>D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\BepInEx\plugins\UMM\UMM.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\ULTRAKILL_Data\Managed\UnityEngine.dll</HintPath>
@@ -124,7 +124,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>IF EXIST "D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\" (
-    copy "$(TargetPath)" "D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\BepInEx\UKMM Mods\UKSoundReplacement\UKSoundReplacement.dll"
+    copy "$(TargetPath)" "D:\Vidjagames\Steam\steamapps\common\ULTRAKILL\BepInEx\UMM Mods\UKSoundReplacement\UKSoundReplacement.dll"
 )
 IF EXIST "C:\Program Files (x86)\Steam\steamapps\common\ULTRAKILL\BepInEx\UMM Mods\UKSoundReplacement" (
     copy "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\ULTRAKILL\BepInEx\UMM Mods\UKSoundReplacement\UKSoundReplacement.dll"
