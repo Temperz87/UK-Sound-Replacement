@@ -354,15 +354,6 @@ public static class Inject_SoundPackShops
     }
 }
 
-[HarmonyPatch(typeof(CustomMusicSoundtrackBrowser), "Rebuild")]
-public static class Inject_CustomCGMusic
-{
-    public static void Postfix(CustomMusicSoundtrackBrowser __instance, List<IDirectoryTree> ___currentDirectory)
-    {
-        
-    }
-}
-
 [HarmonyPatch(typeof(WaveMenu), "Start")]
 public static class Inject_CgMusicSelector
 {

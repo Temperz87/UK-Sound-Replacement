@@ -65,7 +65,7 @@ public class Plugin : UKMod
             SoundPackController.persistentIntroName = cgIntro.ToString();
         */
     }
-
+        
     public void SetSoundPackPersistent(string name, SoundPackController.SoundPackType type)
     {
         Debug.Log("Setting persistent sound pack to " + name + " for type " + type);
