@@ -196,9 +196,9 @@ public static class Inject_SoundPackShops
                 toSet.Add(rcImage);
                 toSet.Add(rlImage);
 
-                AudioSource source = GameObject.Instantiate(newRc.GetComponent<ShopButton>().clickSound).GetComponent<AudioSource>();
+                AudioSource source = GameObject.Instantiate(newAll.GetComponent<ShopButton>().clickSound).GetComponent<AudioSource>();
                 source.volume = 1f;
-                SoundPackController.SetAudioSourceClip(source, "Random", SoundPackController.SoundPackType.Railcannon); // The final argument doesn't really matter as it won't actually play a random sound from that specific type, just pack
+                SoundPackController.SetAudioSourceClip(source, "Random", SoundPackController.SoundPackType.All);
                 source.Play();
             });
 
