@@ -6,7 +6,7 @@ using UnityEngine;
 using UMM;
 using System.Reflection;
 
-[UKPlugin("tempy.soundreplacement", "UKSoundReplacement", "1.2.4", "Replaces gun sounds and cybergrind music from sound packs", true, true)]
+[UKPlugin("tempy.soundreplacement", "UKSoundReplacement", "1.2.5", "Replaces gun sounds from sound packs", true, true)]
 public class Plugin : UKMod
 {   
     public static Plugin instance { get; private set; }
@@ -18,11 +18,31 @@ public class Plugin : UKMod
         harmony = new Harmony("tempy.soundreplacement");
         //Assembly.Load(modFolder + "\\TagLibSharp.dll");
         harmony.PatchAll();
-        DirectoryInfo info = new DirectoryInfo(Directory.GetCurrentDirectory());
         SoundPackController.CreateNewSoundPack("Stock");
         Debug.Log("Searching " + Directory.GetCurrentDirectory() + " for .uksr files");
-        StartCoroutine(SoundPackController.LoadCgMusic(modFolder, this));
-        foreach (FileInfo file in info.GetFiles("*.uksr", SearchOption.AllDirectories))
+        //StartCoroutine(SoundPackController.LoadCgMusic(modFolder, this));
+        foreach (FileInfo file in new DirectoryInfo(Directory.GetCurrentDirectory()).GetFiles("*.uksr", SearchOption.AllDirectories))
+        {
+            using (StreamReader jFile = file.OpenText())
+            {
+                Dictionary<string, string> jValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(jFile.ReadToEnd());
+                string name = "No Name";
+                if (jValues.ContainsKey("name"))
+                    name = jValues["name"];
+                if (name != "Template")
+                {
+                    Debug.Log("Found .uksr " + name + " at path " + file.FullName);
+                    SoundPackController.SoundPack newPack = SoundPackController.CreateNewSoundPack(name);
+                    StartCoroutine(newPack.LoadFromDirectory(file.Directory, this));
+                }
+                jFile.Close();
+            }
+        }
+
+
+        Debug.Log("Searching " + this.modFolder + " for .uksr files");
+        //StartCoroutine(SoundPackController.LoadCgMusic(modFolder, this));
+        foreach (FileInfo file in new DirectoryInfo(this.modFolder).GetFiles("*.uksr", SearchOption.AllDirectories))
         {
             using (StreamReader jFile = file.OpenText())
             {
