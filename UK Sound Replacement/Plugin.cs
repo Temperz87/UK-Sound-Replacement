@@ -6,7 +6,7 @@ using UnityEngine;
 using UMM;
 using System.Reflection;
 
-[UKPlugin("UKSoundReplacement", "1.2.3", "Replaces gun sounds and cybergrind music from sound packs", true, true)]
+[UKPlugin("tempy.soundreplacement", "UKSoundReplacement", "1.2.4", "Replaces gun sounds and cybergrind music from sound packs", true, true)]
 public class Plugin : UKMod
 {   
     public static Plugin instance { get; private set; }
@@ -55,15 +55,17 @@ public class Plugin : UKMod
         object rl = RetrieveStringPersistentModData("rl");
         if (rl != null)
             SoundPackController.SetCurrentSoundPack(rl.ToString(), SoundPackController.SoundPackType.RocketLauncher);
+        
+        /*
         object cgLoop = RetrieveStringPersistentModData("cgLoop");
         if (cgLoop != null)
             SoundPackController.persistentLoopName = cgLoop.ToString();
         object cgIntro = RetrieveStringPersistentModData("cgIntro");
         if (cgIntro != null)
             SoundPackController.persistentIntroName = cgIntro.ToString();
-
+        */
     }
-
+        
     public void SetSoundPackPersistent(string name, SoundPackController.SoundPackType type)
     {
         Debug.Log("Setting persistent sound pack to " + name + " for type " + type);
