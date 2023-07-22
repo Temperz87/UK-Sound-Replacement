@@ -251,8 +251,8 @@ public static class SoundPackController
     }
     private static IEnumerator StartNewWWWCg(string path, AudioType type, string introName, SoundtrackSong song)
     {
-
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(path, type))
+		// file:// is required for linux/mac - Ali
+        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + path, type))
         {
             yield return www.SendWebRequest();
 
@@ -495,7 +495,8 @@ public static class SoundPackController
 
             if (File.Exists(info.FullName + "/preview.png"))
             {
-                using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(info.FullName + "/preview.png"))
+            	// file:// is required for linux/mac - Ali
+                using (UnityWebRequest www = UnityWebRequestTexture.GetTexture("file://" + info.FullName + "/preview.png"))
                 {
                     yield return www.SendWebRequest();
                     if (www.isNetworkError)
@@ -514,7 +515,8 @@ public static class SoundPackController
 
         private IEnumerator StartNewWWW(SoundAspect aspect, string soundUrl, AudioType type)
         {
-            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(soundUrl, type))
+        	// file:// is required for linux/mac - Ali
+            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + soundUrl, type))
             {
                 yield return www.SendWebRequest();
 
