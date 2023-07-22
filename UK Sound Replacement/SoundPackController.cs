@@ -22,11 +22,17 @@ public static class SoundPackController
     public static SoundPack railcannonSoundPack = null;
     public static SoundPack rocketLauncherSoundPack = null;
 
-    private static List<string> stockLoadedAspects = new List<string>();
+    //private static List<string> stockLoadedAspects = new List<string>();
     private static List<string> stockLoadedClips = new List<string>();
 
     public static SoundPack CreateNewSoundPack(string name) // The new sound aspect system is just easier on me for adding and removing sounds, I could hardcode it but I don't really want to
     {
+        if (allSoundPacks.ContainsKey(name))
+        {
+            Debug.Log("Duplicate sound pack found: " + name);
+            return null;
+        }
+
         SoundPack result = new SoundPack(name);
 
         // Railcannon
@@ -406,12 +412,16 @@ public static class SoundPackController
 
     public static void GetAllAudioClips(ref AudioClip[] clips, string name, SoundPackType type)
     {
-        if (!stockLoadedAspects.Contains(name))
-        {
-            stockLoadedAspects.Add(name);
+        //if (!stockLoadedAspects.Contains(name))
+        //{
+            //stockLoadedAspects.Add(name);
             foreach (AudioClip clip in clips)
-                allSoundPacks["Stock"].GetAspect(name).allClips.Add(clip);
-        }
+                if (!stockLoadedClips.Contains(clip.name))
+                {
+                    allSoundPacks["Stock"].GetAspect(name).allClips.Add(clip);
+                    stockLoadedClips.Add(clip.name);
+                }
+        //}
         SoundPack pack = RetrieveSoundPackByType(type);
         if (pack != null)
         {
@@ -428,9 +438,10 @@ public static class SoundPackController
             Debug.Log("Got a null audiosource while handling " + name);
             return;
         }
-        if (name != "Random" && !stockLoadedAspects.Contains(name) && source.clip != null)
+        if (name != "Random" && !stockLoadedClips.Contains(source.clip.name) && source.clip != null)
         {
-            stockLoadedAspects.Add(name);
+            //if (!stockLoadedAspects.Contains(name))
+                //stockLoadedAspects.Add(name);
             allSoundPacks["Stock"].GetAspect(name).allClips.Add(source.clip);
         }
 

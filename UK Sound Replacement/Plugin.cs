@@ -8,7 +8,7 @@ using System.Reflection;
 
 [UKPlugin("tempy.soundreplacement", "UKSoundReplacement", "1.2.5", "Replaces gun sounds from sound packs", true, true)]
 public class Plugin : UKMod
-{   
+{
     public static Plugin instance { get; private set; }
     private static Harmony harmony;
 
@@ -33,7 +33,8 @@ public class Plugin : UKMod
                 {
                     Debug.Log("Found .uksr " + name + " at path " + file.FullName);
                     SoundPackController.SoundPack newPack = SoundPackController.CreateNewSoundPack(name);
-                    StartCoroutine(newPack.LoadFromDirectory(file.Directory, this));
+                    if (newPack != null)
+                        StartCoroutine(newPack.LoadFromDirectory(file.Directory, this));
                 }
                 jFile.Close();
             }
@@ -54,7 +55,8 @@ public class Plugin : UKMod
                 {
                     Debug.Log("Found .uksr " + name + " at path " + file.FullName);
                     SoundPackController.SoundPack newPack = SoundPackController.CreateNewSoundPack(name);
-                    StartCoroutine(newPack.LoadFromDirectory(file.Directory, this));
+                    if (newPack != null)
+                        StartCoroutine(newPack.LoadFromDirectory(file.Directory, this));
                 }
                 jFile.Close();
             }
@@ -75,7 +77,7 @@ public class Plugin : UKMod
         object rl = RetrieveStringPersistentModData("rl");
         if (rl != null)
             SoundPackController.SetCurrentSoundPack(rl.ToString(), SoundPackController.SoundPackType.RocketLauncher);
-        
+
         /*
         object cgLoop = RetrieveStringPersistentModData("cgLoop");
         if (cgLoop != null)
@@ -85,7 +87,7 @@ public class Plugin : UKMod
             SoundPackController.persistentIntroName = cgIntro.ToString();
         */
     }
-        
+
     public void SetSoundPackPersistent(string name, SoundPackController.SoundPackType type)
     {
         Debug.Log("Setting persistent sound pack to " + name + " for type " + type);
