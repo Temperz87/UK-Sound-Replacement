@@ -19,6 +19,8 @@ public class Plugin : UKMod
         //Assembly.Load(modFolder + "\\TagLibSharp.dll");
         harmony.PatchAll();
         SoundPackController.CreateNewSoundPack("Stock");
+        // Why does this essentially run twice? - Ali
+        /*
         Debug.Log("Searching " + Directory.GetCurrentDirectory() + " for .uksr files");
         //StartCoroutine(SoundPackController.LoadCgMusic(modFolder, this));
         foreach (FileInfo file in new DirectoryInfo(Directory.GetCurrentDirectory()).GetFiles("*.uksr", SearchOption.AllDirectories))
@@ -39,7 +41,7 @@ public class Plugin : UKMod
                 jFile.Close();
             }
         }
-
+		*/
 
         Debug.Log("Searching " + this.modFolder + " for .uksr files");
         //StartCoroutine(SoundPackController.LoadCgMusic(modFolder, this));
